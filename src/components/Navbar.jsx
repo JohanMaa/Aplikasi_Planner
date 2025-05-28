@@ -33,7 +33,8 @@ function Navbar() {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 120, damping: 20, delay: 0.2 }}
-      className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-2xl p-4 flex justify-around items-center border-t border-emerald-100/50 z-50 md:max-w-xs md:left-4 md:bottom-4 md:rounded-2xl md:shadow-lg"
+      className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-2xl p-2 flex flex-wrap justify-around items-center border-t border-emerald-100/50 z-50
+  sm:justify-around md:max-w-xs md:left-4 md:bottom-4 md:rounded-2xl md:shadow-lg"
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       {navItems.map((item, index) => (
