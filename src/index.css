@@ -1,4 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Memakai CSS dari tailwind.config.cjs */
+:root {
 
+
+}
