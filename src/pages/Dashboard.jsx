@@ -8,15 +8,15 @@ import QuickActions from '../components/QuickActions.jsx';
 import Notifications from '../components/Notifications.jsx';
 import TransferHistory from '../components/TransferHistory.jsx';
 import EventNews from '../components/EventNews.jsx';
-import JadwalPengangkutanDashboard from '../components/dashboards/JadwalPengangkutanDashboard.jsx';
-import LaporSampahDashboard from '../components/dashboards/LaporSampahDashboard.jsx';
-import PilahSampahDashboard from '../components/dashboards/PilahSampahDashboard.jsx';
-import PengangkutanDashboard from '../components/dashboards/PengangkutanDashboard.jsx';
-import BayarTagihanDashboard from '../components/dashboards/BayarTagihanDashboard.jsx';
-import StatistikSampahDashboard from '../components/dashboards/StatistikSampahDashboard.jsx';
-import EdukasiSampahDashboard from '../components/dashboards/EdukasiSampahDashboard.jsx';
-import NotificationsDashboard from '../components/dashboards/NotificationsDashboard.jsx';
-import SettingsDashboard from '../components/dashboards/SettingsDashboard.jsx';
+import JadwalPengangkutanDashboard from '../components/dashboard/JadwalPengangkutanDashboard.jsx';
+import LaporSampahDashboard from '../components/dashboard/LaporSampahDashboard.jsx';
+import PilahSampahDashboard from '../components/dashboard/PilahSampahDashboard.jsx';
+import PengangkutanDashboard from '../components/dashboard/PengangkutanDashboard.jsx';
+import BayarTagihanDashboard from '../components/dashboard/BayarTagihanDashboard.jsx';
+import StatistikSampahDashboard from '../components/dashboard/StatistikSampahDashboard.jsx';
+import EdukasiSampahDashboard from '../components/dashboard/EdukasiSampahDashboard.jsx';
+import NotificationsDashboard from '../components/dashboard/NotificationsDashboard.jsx';
+import SettingsDashboard from '../components/dashboard/SettingsDashboard.jsx';
 
 function Dashboard() {
   const [data, setData] = useState(null);
