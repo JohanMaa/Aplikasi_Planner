@@ -16,7 +16,7 @@ function Navbar() {
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-      className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 flex justify-around items-center border-t border-gray-200"
+      className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl p-4 flex justify-around items-center border-t border-gray-200"
     >
       {navItems.map((item, index) => (
         <NavLink
@@ -25,24 +25,35 @@ function Navbar() {
           className={({ isActive }) =>
             `flex flex-col items-center space-y-1 ${
               item.name === 'Transfer'
-                ? 'scale-125 text-blue-600'
+                ? 'scale-150 -translate-y-6'
                 : isActive
-                ? 'text-blue-600'
-                : 'text-gray-600 hover:text-blue-500'
-            } transition-colors duration-200`
+                ? 'text-blue-700'
+                : 'text-gray-500 hover:text-blue-600'
+            } transition-colors duration-300`
           }
         >
           <motion.div
-            whileHover={{ scale: 1.2, rotate: item.name === 'Transfer' ? 360 : 0 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+            whileHover={{
+              scale: item.name === 'Transfer' ? 1.1 : 1.2,
+              rotate: item.name === 'Transfer' ? 180 : 0,
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className={`text-2xl ${
-              item.name === 'Transfer' ? 'bg-blue-100 p-3 rounded-full' : ''
+              item.name === 'Transfer'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-full shadow-lg ring-2 ring-blue-200'
+                : 'p-2'
             }`}
           >
             {item.icon}
           </motion.div>
-          <span className="text-xs font-medium">{item.name}</span>
+          <span
+            className={`text-xs font-medium ${
+              item.name === 'Transfer' ? 'text-blue-700 font-semibold' : ''
+            }`}
+          >
+            {item.name}
+          </span>
         </NavLink>
       ))}
     </motion.nav>

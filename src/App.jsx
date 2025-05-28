@@ -9,7 +9,7 @@ import Settings from './pages/Settings.jsx';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<Dashboard />} />
