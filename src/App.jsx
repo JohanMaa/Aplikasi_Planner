@@ -6,6 +6,7 @@ import Transfer from './pages/Transfer.jsx';
 import Profile from './pages/Profile.jsx';
 import Settings from './pages/Settings.jsx';
 import UserDetail from './components/UserDetails.jsx'; // Impor UserDetail
+// import EditProfileForm from './pages/EditProfileForm.jsx'; 
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/home" element={<Dashboard />} />
             {/* <Route path="/" element={<Dashboard />} /> */}
             <Route path="/compose" element={<Compose />} />
+            <Route path="/EditProfileForm" element={<Compose />} />
             <Route path="/transfer" element={<Transfer />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/userdetail" element={<UserDetail />} />

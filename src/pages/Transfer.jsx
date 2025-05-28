@@ -1,8 +1,8 @@
+// Transfer.jsx (Placeholder)
 function Transfer() {
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Transfer</h1>
-      {/* Add content here */}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4 sm:p-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Transfer</h1>
     </div>
   );
 }
