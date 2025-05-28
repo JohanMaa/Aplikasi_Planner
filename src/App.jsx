@@ -43,7 +43,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 flex flex-col overflow-hidden">
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto px-6 py-8">
           <Routes>
             <Route path="/home" element={<Dashboard />} />
             <Route path="/compose" element={<Compose />} />
