@@ -31,29 +31,29 @@ function Header({ userName, notifications, setCurrentDashboard }) {
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-      className="sticky top-0 z-20 flex justify-between items-center mb-8 bg-transparent backdrop-blur-md p-4 sm:p-6 rounded-full border border-[#90EE90] shadow-sm"
+      transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+      className="sticky top-0 z-20 flex justify-between items-center mb-6 bg-[#2E8B57] p-4 sm:p-6 rounded-xl shadow-sm text-white bg-opacity-95"
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
-      <h1 className="text-lg sm:text-xl font-bold text-[#2E8B57] tracking-tight">{`Selamat Siang, ${userName}`}</h1>
-      <div className="flex space-x-2 sm:space-x-3 relative">
+      <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{`Selamat Siang, ${userName}`}</h1>
+      <div className="flex space-x-3 sm:space-x-4 relative">
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsNotifOpen(!isNotifOpen)}
-          className="cursor-pointer p-2 rounded-full bg-[#F5F5F5] hover:bg-[#90EE90] transition-colors duration-200"
+          className="cursor-pointer p-2 sm:p-3 rounded-full bg-[#90EE90] hover:bg-[#FFD700] transition-colors duration-200"
           aria-label="Notifikasi"
         >
-          <FaBell className="text-base sm:text-lg text-[#2E8B57]" />
+          <FaBell className="text-lg sm:text-xl text-[#2E8B57]" />
         </motion.div>
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => handleNotificationClick("Settings")}
-          className="cursor-pointer p-2 rounded-full bg-[#F5F5F5] hover:bg-[#90EE90] transition-colors duration-200"
+          className="cursor-pointer p-2 sm:p-3 rounded-full bg-[#90EE90] hover:bg-[#FFD700] transition-colors duration-200"
           aria-label="Pengaturan"
         >
-          <FaCog className="text-base sm:text-lg text-[#2E8B57]" />
+          <FaCog className="text-lg sm:text-xl text-[#2E8B57]" />
         </motion.div>
         <AnimatePresence>
           {isNotifOpen && (
@@ -62,10 +62,10 @@ function Header({ userName, notifications, setCurrentDashboard }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="absolute top-12 right-0 w-60 sm:w-72 bg-[#F5F5F5] rounded-lg shadow-lg border border-[#90EE90] p-4 max-h-72 overflow-y-auto z-30"
+              className="absolute top-12 right-0 w-64 sm:w-80 bg-[#F5F5F5] rounded-lg shadow-lg border border-[#90EE90] p-4 max-h-80 overflow-y-auto z-30"
             >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-bold text-[#2E8B57]">Notifikasi</h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-sm font-semibold text-[#2E8B57]">Notifikasi</h3>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -73,10 +73,10 @@ function Header({ userName, notifications, setCurrentDashboard }) {
                   className="text-[#6B7280] hover:text-[#2E8B57]"
                   aria-label="Tutup notifikasi"
                 >
-                  <FaTimes className="text-xs" />
+                  <FaTimes className="text-sm" />
                 </motion.button>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {notifications.map((entry, index) => (
                   <motion.div
                     key={index}
@@ -85,23 +85,23 @@ function Header({ userName, notifications, setCurrentDashboard }) {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                     whileHover={{ backgroundColor: "#90EE90" }}
                     onClick={() => handleNotificationClick(entry.dashboard)}
-                    className="flex items-center justify-between p-2 rounded-md cursor-pointer border-b border-[#90EE90]"
+                    className="flex items-center justify-between p-2 rounded-lg cursor-pointer border-b border-[#90EE90]"
                     aria-label={`Lihat notifikasi: ${entry.message}`}
                   >
                     <div className="flex items-center">
-                      <FaBell className="text-[#2E8B57] mr-2 text-xs" />
-                      <p className="text-sm text-[#000000]">{entry.message}</p>
+                      <FaBell className="text-[#2E8B57] mr-2 text-sm" />
+                      <p className="text-sm text-[#6B7280]">{entry.message}</p>
                     </div>
                     <motion.span
                       whileHover={{ scale: 1.1 }}
-                      className="text-xs font-bold text-[#2E8B57]"
+                      className="text-xs font-medium text-[#2E8B57]"
                     >
                       Lihat
                     </motion.span>
                   </motion.div>
                 ))}
               </div>
-              <p className="text-xs text-[#6B7280] mt-2 text-center">Terakhir diperbarui 29 Mei 2025, 02:25 WIB</p>
+              <p className="text-xs text-[#6B7280] mt-3 text-center">Terakhir diperbarui 29 Mei 2025, 02:20 WIB</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -123,19 +123,19 @@ function BalanceCard({ balance, accountNumber }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-      whileHover={{ translateY: -2, boxShadow: "0 12px 24px rgba(46,139,87,0.2)", borderColor: "#FFD700" }}
-      className="relative bg-[#2E8B57] rounded-2xl shadow-lg p-6 sm:p-8 mb-12 text-white border-2 border-transparent overflow-hidden"
+      transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+      whileHover={{ scale: 1.03, boxShadow: "0 8px 24px rgba(46,139,87,0.3)" }}
+      className="relative bg-gradient-to-br from-[#90EE90] to-[#2E8B57] rounded-xl shadow-lg p-6 sm:p-8 mb-6 text-white overflow-hidden"
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FFFFFF' fill-opacity='0.2'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E")` }} />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-30 animate-pulse" />
       <div className="relative">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold">Saldo Rekening</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Billing Information</h2>
           <motion.a
-            href="#"
+            href="#!"
             whileHover={{ scale: 1.1 }}
-            className="text-[#FFD700] text-sm font-bold hover:text-[#FFD700]/80 transition-colors"
+            className="text-[#FFD700] text-sm font-medium hover:text-[#FFD700]/80 transition-colors"
             aria-label="Atur saldo"
           >
             Atur
@@ -147,13 +147,13 @@ function BalanceCard({ balance, accountNumber }) {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleToggleBalance}
-            className="cursor-pointer p-2 rounded-full bg-[#F5F5F5] hover:bg-[#90EE90] transition-colors"
+            className="cursor-pointer p-2 sm:p-3 rounded-md bg-[#FFD700] hover:bg-[#FFD700]/80 transition-colors"
             aria-label={showBalance ? "Sembunyikan saldo" : "Tampilkan saldo"}
           >
-            {showBalance ? <FaEyeSlash className="text-base sm:text-lg text-[#2E8B57]" /> : <FaEye className="text-base sm:text-lg text-[#2E8B57]" />}
+            {showBalance ? <FaEyeSlash className="text-lg sm:text-xl text-[#2E8B57]" /> : <FaEye className="text-lg sm:text-xl text-[#2E8B57]" />}
           </motion.div>
         </div>
-        <p className="text-[#000000] text-sm font-bold tracking-tight">{accountNumber}</p>
+        <p className="text-[#FFD700] text-sm tracking-tight">{accountNumber}</p>
       </div>
     </motion.div>
   );
@@ -170,28 +170,31 @@ function QuickActions({ quickActions, setCurrentDashboard }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-      className="mb-12 overflow-x-auto flex space-x-4 p-4 bg-transparent"
+      transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+      className="rounded-xl shadow-sm p-6 sm:p-8 mb-6 bg-[#F5F5F5] border border-[#90EE90]"
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
-      {quickActions.map((action, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: index * 0.1, type: "spring" }}
-          whileHover={{ scale: 1.1, translateY: -2 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => handleActionClick(action.dashboard)}
-          className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-full bg-[#F5F5F5] border border-[#90EE90] cursor-pointer transition-all duration-200 hover:bg-[#90EE90]"
-          aria-label={action.name}
-        >
-          <div className="text-xl text-[#2E8B57]">
-            {iconMap[action.icon]}
-          </div>
-          <span className="text-xs font-normal text-[#000000] mt-1 text-center">{action.name}</span>
-        </motion.div>
-      ))}
+      <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57] mb-4">Quick Actions</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+        {quickActions.map((action, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: index * 0.1, type: "spring" }}
+            whileHover={{ scale: 1.05, backgroundColor: "#90EE90" }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleActionClick(action.dashboard)}
+            className="flex flex-col items-center p-3 rounded-lg cursor-pointer transition-all duration-200 bg-white border border-[#90EE90]"
+            aria-label={action.name}
+          >
+            <div className="text-2xl text-[#2E8B57] mb-2">
+              {iconMap[action.icon]}
+            </div>
+            <span className="text-sm font-medium text-[#2E8B57] text-center">{action.name}</span>
+          </motion.div>
+        ))}
+      </div>
     </motion.div>
   );
 }
@@ -201,14 +204,14 @@ function TransferHistory({ transferHistory }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0, rotate: 1 }}
-      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-      className="rounded-2xl shadow-lg p-6 sm:p-8 mb-8 bg-[#F5F5F5] border border-[#90EE90] transform"
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+      className="rounded-xl shadow-sm p-6 sm:p-8 bg-[#F5F5F5] border border-[#90EE90]"
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Histori Transfer</h2>
-        <p className="text-xs text-[#6B7280]">Terakhir diperbarui 29 Mei 2025, 02:25 WIB</p>
+        <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Transaction History</h2>
+        <p className="text-xs text-[#6B7280]">Last updated 29 May 2025, 02:20 WIB</p>
       </div>
       <div className="space-y-3">
         {transferHistory.map((entry, index) => (
@@ -217,26 +220,26 @@ function TransferHistory({ transferHistory }) {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
-            whileHover={{ translateY: -2, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
-            className="flex items-center justify-between bg-white p-4 rounded-lg border border-[#90EE90] transition-all duration-200"
+            whileHover={{ scale: 1.02, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+            className="flex items-center justify-between bg-white p-4 rounded-lg border border-[#90EE90] shadow-sm transition-all duration-200"
             aria-label={`Transfer ${entry.type === "out" ? "keluar" : "masuk"}: ${entry.amount}`}
           >
             <div className="flex items-center">
               {entry.type === "out" ? (
-                <FaArrowUp className="text-red-500 mr-3 text-base sm:text-lg" />
+                <FaArrowUp className="text-red-500 mr-3 text-lg sm:text-xl" />
               ) : (
-                <FaArrowDown className="text-[#2E8B57] mr-3 text-base sm:text-lg" />
+                <FaArrowDown className="text-[#2E8B57] mr-3 text-lg sm:text-xl" />
               )}
               <div>
-                <p className="text-sm font-normal text-[#000000]">
-                  {entry.type === "out" ? `Transfer ke ${entry.to}` : `Diterima dari ${entry.from}`}
+                <p className="text-sm font-medium text-[#6B7280]">
+                  {entry.type === "out" ? `Transfer to ${entry.to}` : `Received from ${entry.from}`}
                 </p>
-                <p className={`text-sm font-bold ${entry.type === "out" ? "text-red-500" : "text-[#2E8B57]"}`}>{entry.amount}</p>
+                <p className={`text-sm font-semibold ${entry.type === "out" ? "text-red-500" : "text-[#2E8B57]"}`}>{entry.amount}</p>
                 <p className="text-xs text-[#6B7280]">{entry.date}</p>
               </div>
             </div>
             {entry.isNew && (
-              <span className="text-xs font-bold text-[#2E8B57] bg-[#90EE90] px-2 py-1 rounded-full">Baru</span>
+              <span className="text-xs font-semibold text-[#2E8B57] bg-[#90EE90] px-2 py-1 rounded-full">New</span>
             )}
           </motion.div>
         ))}
@@ -250,14 +253,14 @@ function EventNews({ eventNews }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0, rotate: -1 }}
-      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-      className="rounded-2xl shadow-lg p-6 sm:p-8 bg-[#F5F5F5] border border-[#90EE90] transform"
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+      className="rounded-xl shadow-sm p-6 sm:p-8 bg-[#F5F5F5] border border-[#90EE90]"
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Berita Acara</h2>
-        <p className="text-xs text-[#6B7280]">Terakhir diperbarui 29 Mei 2025, 02:25 WIB</p>
+        <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Event News</h2>
+        <p className="text-xs text-[#6B7280]">Last updated 29 May 2025, 02:20 WIB</p>
       </div>
       <div className="space-y-3">
         {eventNews.map((news, index) => (
@@ -266,17 +269,17 @@ function EventNews({ eventNews }) {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
-            whileHover={{ translateY: -2, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
-            className="flex items-center justify-between bg-white p-4 rounded-lg border border-[#90EE90] transition-all duration-200"
+            whileHover={{ scale: 1.02, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+            className="flex items-center justify-between bg-white p-4 rounded-lg border border-[#90EE90] shadow-sm transition-all duration-200"
             aria-label={`Berita: ${news.title}`}
           >
-            <span className="text-sm font-normal text-[#000000]">{news.title}</span>
+            <span className="text-sm font-medium text-[#6B7280]">{news.title}</span>
             <span
-              className={`text-xs font-bold px-2 py-1 rounded-full ${
+              className={`text-xs font-semibold px-2 py-1 rounded-full ${
                 news.status === "Baru"
                   ? "text-[#2E8B57] bg-[#90EE90]"
                   : news.status === "Selesai"
-                  ? "text-[#6B7280] bg-[#F5F5F5]"
+                  ? "text-[#2E8B57] bg-[#90EE90]"
                   : "text-red-500 bg-red-100"
               }`}
             >
@@ -297,24 +300,24 @@ function JadwalPengangkutanDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Jadwal Pengangkutan</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Transportation Schedule</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -327,8 +330,8 @@ function JadwalPengangkutanDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Jadwal: ${item.date} ${item.time}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">{item.date} - {item.time}</p>
-              <p className="text-sm text-[#000000]">Lokasi: {item.location}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">{item.date} - {item.time}</p>
+              <p className="text-sm text-[#6B7280]">Location: {item.location}</p>
             </motion.div>
           ))}
         </div>
@@ -344,24 +347,24 @@ function LaporSampahDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Lapor Sampah</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Report Waste</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -374,9 +377,9 @@ function LaporSampahDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Laporan sampah: ${item.id}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">ID: {item.id}</p>
-              <p className="text-sm text-[#000000]">Lokasi: {item.location}</p>
-              <p className="text-sm text-[#000000]">Status: {item.status}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">ID: {item.id}</p>
+              <p className="text-sm text-[#6B7280]">Location: {item.location}</p>
+              <p className="text-sm text-[#6B7280]">Status: {item.status}</p>
             </motion.div>
           ))}
         </div>
@@ -392,24 +395,24 @@ function PilahSampahDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Pilah Sampah</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Sort Waste</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -422,9 +425,9 @@ function PilahSampahDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Pilah sampah: ${item.type}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">{item.type}</p>
-              <p className="text-sm text-[#000000]">Berat: {item.weight}</p>
-              <p className="text-sm text-[#000000]">Tanggal: {item.date}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">{item.type}</p>
+              <p className="text-sm text-[#6B7280]">Weight: {item.weight}</p>
+              <p className="text-sm text-[#6B7280]">Date: {item.date}</p>
             </motion.div>
           ))}
         </div>
@@ -440,24 +443,24 @@ function PengangkutanDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Pengangkutan</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Transportation</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -470,9 +473,9 @@ function PengangkutanDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Pengangkutan: ${item.id}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">ID: {item.id}</p>
-              <p className="text-sm text-[#000000]">Tanggal: {item.date}</p>
-              <p className="text-sm text-[#000000]">Status: {item.status}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">ID: {item.id}</p>
+              <p className="text-sm text-[#6B7280]">Date: {item.date}</p>
+              <p className="text-sm text-[#6B7280]">Status: {item.status}</p>
             </motion.div>
           ))}
         </div>
@@ -488,24 +491,24 @@ function BayarTagihanDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Bayar Tagihan</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Pay Bills</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -518,9 +521,9 @@ function BayarTagihanDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Tagihan: ${item.billId}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">ID Tagihan: {item.billId}</p>
-              <p className="text-sm text-[#000000]">Jumlah: {item.amount}</p>
-              <p className="text-sm text-[#000000]">Jatuh Tempo: {item.dueDate}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">Bill ID: {item.billId}</p>
+              <p className="text-sm text-[#6B7280]">Amount: {item.amount}</p>
+              <p className="text-sm text-[#6B7280]">Due Date: {item.dueDate}</p>
             </motion.div>
           ))}
         </div>
@@ -536,24 +539,24 @@ function StatistikSampahDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Statistik Sampah</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Waste Statistics</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -566,9 +569,9 @@ function StatistikSampahDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Statistik: ${item.month}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">{item.month}</p>
-              <p className="text-sm text-[#000000]">Organik: {item.organik}</p>
-              <p className="text-sm text-[#000000]">Anorganik: {item.anorganik}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">{item.month}</p>
+              <p className="text-sm text-[#6B7280]">Organic: {item.organik}</p>
+              <p className="text-sm text-[#6B7280]">Inorganic: {item.anorganik}</p>
             </motion.div>
           ))}
         </div>
@@ -584,24 +587,24 @@ function EdukasiSampahDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Edukasi Sampah</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Waste Education</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -614,8 +617,8 @@ function EdukasiSampahDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Edukasi: ${item.title}`}
             >
-              <p className="text-sm font-bold text-[#2E8B57]">{item.title}</p>
-              <p className="text-sm text-[#000000]">{item.content}</p>
+              <p className="text-sm font-semibold text-[#2E8B57]">{item.title}</p>
+              <p className="text-sm text-[#6B7280]">{item.content}</p>
             </motion.div>
           ))}
         </div>
@@ -631,24 +634,24 @@ function NotificationsDashboard({ data, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Notifikasi</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Notifications</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
         <div className="space-y-3">
@@ -661,7 +664,7 @@ function NotificationsDashboard({ data, onBack }) {
               className="border-b border-[#90EE90] pb-3"
               aria-label={`Notifikasi: ${item.message}`}
             >
-              <p className="text-sm text-[#000000]">{item.message}</p>
+              <p className="text-sm text-[#6B7280]">{item.message}</p>
             </motion.div>
           ))}
         </div>
@@ -677,27 +680,27 @@ function SettingsDashboard({ onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#90EE90] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#90EE90] p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="bg-[#F5F5F5] rounded-2xl shadow-lg p-6 sm:p-8 border border-[#90EE90]"
+        transition={{ duration: 0.5, type: "spring", stiffness: 80 }}
+        className="bg-[#F5F5F5] rounded-xl shadow-sm p-6 sm:p-8 border border-[#90EE90]"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-[#2E8B57]">Pengaturan</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#2E8B57]">Settings</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleBackClick}
-            className="text-[#2E8B57] text-sm font-bold hover:text-[#FFD700] transition-colors"
+            className="text-[#2E8B57] text-sm font-medium hover:text-[#FFD700] transition-colors"
             aria-label="Kembali ke dashboard utama"
           >
-            Kembali
+            Back
           </motion.button>
         </div>
-        <p className="text-sm text-[#000000]">Ini adalah halaman pengaturan. (Placeholder)</p>
+        <p className="text-sm text-[#6B7280]">This is the settings page. (Placeholder)</p>
       </motion.div>
     </div>
   );
@@ -722,7 +725,7 @@ function MainDashboard() {
       <div className="min-h-screen bg-[#90EE90] flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: 'Infinity', ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           className="text-[#2E8B57] text-3xl sm:text-4xl"
           aria-label="Memuat"
         >
@@ -734,7 +737,7 @@ function MainDashboard() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#90EE90] flex items-center justify-center text-center p-6 sm:p-8 text-[#000000]" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className="min-h-screen bg-[#90EE90] flex items-center justify-center text-center p-4 sm:p-6 text-[#6B7280]" style={{ fontFamily: 'Inter, sans-serif' }}>
         Data tidak tersedia
       </div>
     );
@@ -745,10 +748,10 @@ function MainDashboard() {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentDashboard}
-          initial={{ opacity: 0, x: 20 }}
+          initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+          exit={{ opacity: 0, x: -100 }}
+          transition={{ duration: 0.4, type: "spring", stiffness: 80 }}
         >
           {(() => {
             switch (currentDashboard) {
@@ -774,7 +777,7 @@ function MainDashboard() {
                 return <Profile setCurrentDashboard={setCurrentDashboard} />;
               default:
                 return (
-                  <div className="min-h-screen bg-[#90EE90] flex items-center justify-center text-center p-6 sm:p-8 text-[#000000]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  <div className="min-h-screen bg-[#90EE90] flex items-center justify-center text-center p-4 sm:p-6 text-[#6B7280]" style={{ fontFamily: 'Inter, sans-serif' }}>
                     Dashboard tidak ditemukan
                   </div>
                 );
@@ -787,10 +790,10 @@ function MainDashboard() {
 
   return (
     <div
-      className="min-h-screen bg-[#90EE90] overflow-y-auto p-8 sm:p-12"
+      className="min-h-screen bg-[#90EE90] overflow-y-auto p-6 sm:p-8"
       style={{
         fontFamily: 'Inter, sans-serif',
-        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'15\' height=\'15\' viewBox=\'0 0 15 15\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%232E8B57\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M7.5 2a1 1 0 0 0-1 1v2.5H4 a1 1 0 0 0 0 2h2.5V10a1 1 0 0 0 2 0V7.5H11a1 1 0 0 0 0-2H8.5V3a1 1 0 0 0-1-1z\'/%3E%3C/g%3E%3C/svg%3E")'
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%232E8B57' fill-opacity='0.1'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E")`
       }}
     >
       <Header
@@ -806,15 +809,17 @@ function MainDashboard() {
         quickActions={data.quickActions}
         setCurrentDashboard={setCurrentDashboard}
       />
-      <TransferHistory transferHistory={data.transferHistory} />
-      <EventNews eventNews={data.eventNews} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <TransferHistory transferHistory={data.transferHistory} />
+        <EventNews eventNews={data.eventNews} />
+      </div>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="mt-8 text-center text-sm text-[#000000]"
+        className="mt-8 text-center text-sm text-[#6B7280]"
       >
-        <p>© 2025 MyBank Indonesia. Seluruh hak cipta dilindungi.</p>
+        <p>© 2025 MyBank Indonesia. All rights reserved.</p>
       </motion.div>
     </div>
   );
