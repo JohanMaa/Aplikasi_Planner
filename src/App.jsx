@@ -35,6 +35,7 @@ import Settings from './pages/Settings.jsx';
 import UserDetail from './components/UserDetails.jsx'; // Impor UserDetail
 
 function App() {
+  
   return (
     <Router>
       <div className="min-h-screen bg-gray-100 flex flex-col">
