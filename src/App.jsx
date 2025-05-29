@@ -4,7 +4,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Compose from './pages/Compose.jsx';
 import Transfer from './pages/Transfer.jsx';
 import Profile from './pages/Profile.jsx';
-import Settings from './pages/Settings.jsx';
+import History from './pages/History.jsx';
 import UserDetail from './components/UserDetails.jsx'; // Impor UserDetail
 // import EditProfileForm from './pages/EditProfileForm.jsx'; 
 
@@ -22,7 +22,7 @@ function App() {
             <Route path="/transfer" element={<Transfer />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/userdetail" element={<UserDetail />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/History" element={<History />} />
           </Routes>
         </div>
 

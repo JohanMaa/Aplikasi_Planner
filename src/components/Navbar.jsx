@@ -7,7 +7,7 @@ const navItems = [
   { name: 'Home', path: '/home', icon: <FaHome />, ariaLabel: 'Home' },
   { name: 'Compose', path: '/compose', icon: <FaLeaf />, ariaLabel: 'Compose' },
   { name: 'Transfer', path: '/transfer', icon: <FaExchangeAlt />, ariaLabel: 'Transfer' },
-  { name: 'History', path: '/settings', icon: <FaHistory />, ariaLabel: 'Settings' },
+  { name: 'History', path: '/History', icon: <FaHistory />, ariaLabel: 'History' },
   { name: 'Akun', path: '/profile', icon: <FaUser />, ariaLabel: 'Profile' },
 ];
 
