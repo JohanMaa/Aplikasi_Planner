@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaHome, FaExchangeAlt, FaUser, FaHistory, FaChartLine } from 'react-icons/fa';
+import { FaHome, FaExchangeAlt, FaUser, FaHistory, FaChartLine ,FaLeaf } from 'react-icons/fa';
 
 // Define navigation items
 const navItems = [
@@ -8,7 +8,7 @@ const navItems = [
   {
     name: 'Monitoring',
     path: '/compose',
-    icon: <FaChartLine />,
+    icon: <FaLeaf />,
     ariaLabel: 'Monitoring',
   },
   { name: 'Transfer', path: '/transfer', icon: <FaExchangeAlt />, ariaLabel: 'Transfer' },
