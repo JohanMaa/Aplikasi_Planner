@@ -131,14 +131,14 @@ function BalanceCard({ balance, accountNumber }) {
       <div className="relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg sm:text-xl font-semibold">Saldo Rekening</h2>
-          <motion.a
+          {/* <motion.a
             href="#"
             whileHover={{ scale: 1.1 }}
             className="text-green-600 text-sm font-medium hover:text-green-800 transition-colors"
             aria-label="Atur saldo"
           >
             Atur
-          </motion.a>
+          </motion.a> */}
         </div>
         <div className="flex items-center space-x-3 mb-4">
           <p className="text-2xl sm:text-3xl font-semibold tracking-wide">{showBalance ? balance : "Rp ********"}</p>
