@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { FaCamera, FaCog, FaQuestionCircle, FaHeadset, FaSave, FaTimes, FaSpinner, FaEdit, FaInfoCircle, FaUser, FaLock, FaBell, FaGlobe, FaSignOutAlt } from 'react-icons/fa';
+import { FaCamera, FaCog, FaQuestionCircle, FaHeadset, FaSave, FaTimes, FaSpinner, FaEdit } from 'react-icons/fa';
 import { homeData } from '../data/data'; // Adjust path based on your project structure
 
 function Profile({ setCurrentDashboard }) {
@@ -8,7 +8,6 @@ function Profile({ setCurrentDashboard }) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({ ...homeData });
   const [isSaving, setIsSaving] = useState(false);
-  const [errors, setErrors] = useState({});
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -33,24 +32,9 @@ function Profile({ setCurrentDashboard }) {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
-  };
-
-  const validateInput = () => {
-    const newErrors = {};
-    if (!formData.userName) newErrors.userName = 'Nama wajib diisi';
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email tidak valid';
-    }
-    if (formData.phone && !/^\+?\d{10,13}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Nomor telepon tidak valid';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = () => {
-    if (!validateInput()) return;
     setIsSaving(true);
     setTimeout(() => {
       console.log('Saving data:', formData);
@@ -63,28 +47,25 @@ function Profile({ setCurrentDashboard }) {
   const handleCancel = () => {
     setFormData({ ...homeData });
     setIsEditMode(false);
-    setErrors({});
   };
 
   const handleFinish = () => {
-    if (window.confirm('Apakah Anda yakin ingin mereset data profil?')) {
-      setIsSaving(true);
-      setTimeout(() => {
-        console.log('Finishing and saving data:', formData);
-        Object.assign(homeData, formData);
-        setFormData({
-          userName: 'New User',
-          role: '',
-          phone: '',
-          email: '',
-          device: 'Unknown Device',
-          appVersion: '1.0.0',
-          status: 'Aktif',
-        });
-        setIsEditMode(false);
-        setIsSaving(false);
-      }, 1000);
-    }
+    setIsSaving(true);
+    setTimeout(() => {
+      console.log('Finishing and saving data:', formData);
+      Object.assign(homeData, formData); // Save data before resetting
+      setFormData({
+        userName: 'New User',
+        role: '',
+        phone: '',
+        email: '',
+        device: 'Unknown Device',
+        appVersion: '1.0.0',
+        status: 'Aktif',
+      });
+      setIsEditMode(false);
+      setIsSaving(false);
+    }, 1000);
   };
 
   const handleClear = () => {
@@ -94,7 +75,6 @@ function Profile({ setCurrentDashboard }) {
       phone: '',
       email: '',
     }));
-    setErrors({});
   };
 
   const getInitials = (name) => {
@@ -142,6 +122,7 @@ function Profile({ setCurrentDashboard }) {
         transition={{ delay: 0.2, type: 'spring', stiffness: 120 }}
         className="w-full max-w-2xl bg-white rounded-2xl shadow-xl -mt-12 p-6 sm:p-8"
       >
+        {/* Edit Button */}
         <div className="flex justify-end mb-4">
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -153,6 +134,7 @@ function Profile({ setCurrentDashboard }) {
             <FaEdit className="mr-2" /> Edit Profil
           </motion.button>
         </div>
+        {/* Avatar & Name */}
         <div className="flex flex-col items-center mb-6">
           <motion.div
             whileHover={{ scale: 1.05, rotate: 2 }}
@@ -182,6 +164,8 @@ function Profile({ setCurrentDashboard }) {
           <h2 className="mt-4 text-xl sm:text-2xl font-semibold text-gray-800">{homeData.userName}</h2>
           <p className="text-sm text-gray-500">{homeData.role || 'N/A'}</p>
         </div>
+
+        {/* Data Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
           <div className="flex justify-between items-center py-3">
             <span className="text-gray-500">Nomor HP</span>
@@ -191,6 +175,7 @@ function Profile({ setCurrentDashboard }) {
             <span className="text-gray-500">Email</span>
             <span className="font-medium text-gray-900">{obscureEmail(homeData.email)}</span>
           </div>
+
           <div className="flex justify-between items-center py-3">
             <span className="text-gray-500">Versi Aplikasi</span>
             <span className="font-medium text-gray-900">{homeData.appVersion}</span>
@@ -209,8 +194,7 @@ function Profile({ setCurrentDashboard }) {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 150, damping: 20, duration: 0.3 }}
-            style={{ willChange: 'transform, opacity' }}
+            transition={{ type: 'spring', stiffness: 150, damping: 20 }}
             className="fixed inset-0 bg-white z-50 flex flex-col sm:items-center sm:justify-center sm:bg-black/60 h-screen w-screen sm:h-auto sm:w-auto"
           >
             <motion.div
@@ -282,9 +266,6 @@ function Profile({ setCurrentDashboard }) {
                       placeholder={`Masukkan ${field.label.toLowerCase()}`}
                       required={field.required}
                     />
-                    {errors[field.name] && (
-                      <p className="text-red-600 text-xs mt-1">{errors[field.name]}</p>
-                    )}
                   </div>
                 ))}
               </div>
@@ -293,101 +274,37 @@ function Profile({ setCurrentDashboard }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={handleClear}
                 className="mt-5 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors w-full sm:w-auto"
-                aria-label="Hapus data"
+                aria-label="Datanya berhasil diubah"
               >
-                Hapus Data
+                Datanya Berhasil Diubah
               </motion.button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Settings */}
+      {/* Quick Settings */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 sm:p-8 mt-6"
       >
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Settings</h3>
-        <div className="space-y-2">
-          <motion.div
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
-            onClick={() => handleNavigation('AccountSettings')}
-            className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
-            aria-label="Buka pengaturan akun"
-          >
-            <div className="flex items-center space-x-3">
-              <FaUser className="w-5 h-5 text-green-600" />
-              <span className="text-gray-700">Pengaturan Akun</span>
-            </div>
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
-            onClick={() => handleNavigation('Security')}
-            className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
-            aria-label="Buka pengaturan keamanan"
-          >
-            <div className="flex items-center space-x-3">
-              <FaLock className="w-5 h-5 text-green-600" />
-              <span className="text-gray-700">Keamanan & Privasi</span>
-            </div>
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
-            onClick={() => handleNavigation('Logout')}
-            className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
-            aria-label="Keluar dari akun"
-          >
-            <div className="flex items-center space-x-3">
-              <FaSignOutAlt className="w-5 h-5 text-red-600" />
-              <span className="text-gray-700">Keluar</span>
-            </div>
-            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Informasi */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-        className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 sm:p-8 mt-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Informasi</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between items-center p-3">
-            <span className="text-gray-700">Versi Aplikasi</span>
-            <span className="text-gray-900 font-medium">{homeData.appVersion}</span>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Pengaturan Cepat</h3>
+        <motion.div
+          whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
+          onClick={() => handleNavigation('Settings')}
+          className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
+          aria-label="Buka pengaturan"
+        >
+          <div className="flex items-center space-x-3">
+            <FaCog className="w-5 h-5 text-green-600" />
+            <span className="text-gray-700">Pengaturan</span>
           </div>
-          <div className="flex justify-between items-center p-3">
-            <span className="text-gray-700">Lisensi</span>
-            <span className="text-gray-900 font-medium">© 2025 MyBank Indonesia</span>
-          </div>
-          <motion.div
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
-            onClick={() => handleNavigation('Informasi')}
-            className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
-            aria-label="Buka informasi lengkap"
-          >
-            <div className="flex items-center space-x-3">
-              <FaInfoCircle className="w-5 h-5 text-green-600" />
-              <span className="text-gray-700">Tentang Aplikasi</span>
-            </div>
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.div>
-        </div>
+          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </motion.div>
       </motion.div>
 
       {/* Contact Support */}
@@ -401,7 +318,6 @@ function Profile({ setCurrentDashboard }) {
         <div className="space-y-2">
           <motion.div
             whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
-            onClick={() => handleNavigation('FAQ')}
             className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
             aria-label="Lihat daftar pertanyaan"
           >
@@ -415,7 +331,6 @@ function Profile({ setCurrentDashboard }) {
           </motion.div>
           <motion.div
             whileHover={{ scale: 1.02, backgroundColor: 'rgba(243, 244, 246, 0.5)' }}
-            onClick={() => window.open('mailto:support@mybank.co.id', '_blank')}
             className="flex justify-between items-center p-3 rounded-lg cursor-pointer transition-all"
             aria-label="Hubungi customer service"
           >
@@ -444,3 +359,4 @@ function Profile({ setCurrentDashboard }) {
 }
 
 export default Profile;
+// -------------- 1
