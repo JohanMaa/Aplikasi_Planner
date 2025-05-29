@@ -175,10 +175,7 @@ function Profile({ setCurrentDashboard }) {
             <span className="text-gray-500">Email</span>
             <span className="font-medium text-gray-900">{obscureEmail(homeData.email)}</span>
           </div>
-          <div className="flex justify-between items-center py-3">
-            <span className="text-gray-500">Perangkat</span>
-            <span className="font-medium text-gray-900">{homeData.device}</span>
-          </div>
+
           <div className="flex justify-between items-center py-3">
             <span className="text-gray-500">Versi Aplikasi</span>
             <span className="font-medium text-gray-900">{homeData.appVersion}</span>
@@ -255,12 +252,8 @@ function Profile({ setCurrentDashboard }) {
               <div className="flex-1 overflow-y-auto space-y-5">
                 {[
                   { label: 'Nama', name: 'userName', type: 'text', required: true },
-                  { label: 'Peran', name: 'role', type: 'text' },
                   { label: 'Nomor HP', name: 'phone', type: 'tel' },
                   { label: 'Email', name: 'email', type: 'email' },
-                  { label: 'Perangkat', name: 'device', type: 'text' },
-                  { label: 'Versi Aplikasi', name: 'appVersion', type: 'text' },
-                  { label: 'Status', name: 'status', type: 'text' },
                 ].map((field) => (
                   <div key={field.name}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>

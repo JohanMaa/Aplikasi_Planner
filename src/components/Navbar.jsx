@@ -1,14 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaHome, FaPen, FaExchangeAlt, FaUser, FaCog } from 'react-icons/fa';
+import { FaHome, FaPen, FaExchangeAlt, FaUser, FaCog, FaHistory } from 'react-icons/fa';
 
 // Define navigation items
 const navItems = [
   { name: 'Home', path: '/home', icon: <FaHome />, ariaLabel: 'Home' },
   { name: 'Compose', path: '/compose', icon: <FaPen />, ariaLabel: 'Compose' },
   { name: 'Transfer', path: '/transfer', icon: <FaExchangeAlt />, ariaLabel: 'Transfer' },
-  { name: 'Profile', path: '/profile', icon: <FaUser />, ariaLabel: 'Profile' },
-  { name: 'Settings', path: '/settings', icon: <FaCog />, ariaLabel: 'Settings' },
+  { name: 'History', path: '/settings', icon: <FaHistory />, ariaLabel: 'Settings' },
+  { name: 'Akun', path: '/profile', icon: <FaUser />, ariaLabel: 'Profile' },
 ];
 
 // Animation variants for nav items
