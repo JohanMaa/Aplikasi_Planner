@@ -1,14 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaCamera, FaUser, FaLock, FaSignOutAlt, FaInfoCircle, FaQuestionCircle, FaHeadset, FaSave, FaTimes, FaSpinner } from 'react-icons/fa';
 import { homeData } from '../data/data'; // Adjust path based on your project structure
 
-function Profile({ setCurrentDashboard }) {
+function Profile() {
   const [profileImage, setProfileImage] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({ ...homeData });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -21,10 +23,12 @@ function Profile({ setCurrentDashboard }) {
 
   const handleNavigation = (dashboard) => {
     if (dashboard === 'AccountSettings') {
-      setIsEditMode(true); // Open edit modal directly
+      setIsEditMode(true); // Open edit modal langsung
+    } else if (dashboard === 'Logout') {
+      localStorage.removeItem('token'); // Hapus token
+      navigate('/login'); // Redirect ke login
     } else {
-      console.log(`Navigating to ${dashboard}`);
-      setCurrentDashboard(dashboard);
+      console.log(`Navigating to ${dashboard}`); // Placeholder untuk navigasi lain
     }
   };
 
@@ -245,15 +249,6 @@ function Profile({ setCurrentDashboard }) {
                 ))}
               </div>
               <div className="flex justify-between mt-6 gap-3">
-                {/* <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleClear}
-                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                  aria-label="Hapus data"
-                >
-                  Hapus Data
-                </motion.button> */}
                 <div className="flex gap-3">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
