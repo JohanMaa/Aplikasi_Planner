@@ -4,12 +4,12 @@ export const users = [
 ];
 
 export const homeData = {
-  userName: "Johan Doe",
+  userName: "Manusia",
   accountNumber: "1111-2222-3333-44",
   balance: "Rp 10,000,000",
-  email: "johan@example.com",
-  phone: "+62 812 3456 7890",
-  address: "Bandung, Indonesia",
+  email: "manusi@example.com",
+  phone: "+62 1111 2222 33333",
+  address: "JAWA, Indonesia",
   device: "Redmi Note 8",
   appVersion: "1.0.0",
   role: "nasabbah",
