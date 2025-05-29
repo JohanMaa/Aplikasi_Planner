@@ -1,13 +1,18 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaHome, FaPen, FaExchangeAlt, FaUser, FaLeaf, FaHistory } from 'react-icons/fa';
+import { FaHome, FaExchangeAlt, FaUser, FaHistory, FaChartLine } from 'react-icons/fa';
 
 // Define navigation items
 const navItems = [
   { name: 'Home', path: '/home', icon: <FaHome />, ariaLabel: 'Home' },
-  { name: 'Compose', path: '/compose', icon: <FaLeaf />, ariaLabel: 'Compose' },
+  {
+    name: 'Monitoring',
+    path: '/compose',
+    icon: <FaChartLine />,
+    ariaLabel: 'Monitoring',
+  },
   { name: 'Transfer', path: '/transfer', icon: <FaExchangeAlt />, ariaLabel: 'Transfer' },
-  { name: 'History', path: '/History', icon: <FaHistory />, ariaLabel: 'History' },
+  { name: 'History', path: '/history', icon: <FaHistory />, ariaLabel: 'History' },
   { name: 'Akun', path: '/profile', icon: <FaUser />, ariaLabel: 'Profile' },
 ];
 
@@ -28,13 +33,17 @@ const navItemVariants = {
 
 // Navbar component
 function Navbar() {
+  const location = useLocation();
+  const hideNavbar = ['/', '/login'].includes(location.pathname);
+
+  if (hideNavbar) return null;
+
   return (
     <motion.nav
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 120, damping: 20, delay: 0.2 }}
-      className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-2xl p-2 flex flex-wrap justify-around items-center border-t border-emerald-100/50 z-50
-  sm:justify-around md:max-w-xs md:left-4 md:bottom-4 md:rounded-2xl md:shadow-lg"
+      className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-2xl p-3 flex flex-wrap justify-around items-center gap-2 border-t border-emerald-100/50 z-50 sm:justify-around md:max-w-md md:left-1/2 md:-translate-x-1/2 md:bottom-4 md:rounded-full md:shadow-lg"
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       {navItems.map((item, index) => (
@@ -44,10 +53,10 @@ function Navbar() {
           className={({ isActive }) =>
             `flex flex-col items-center space-y-1 group relative ${
               item.name === 'Transfer'
-                ? 'scale-125 -translate-y-4'
+                ? 'scale-110 -translate-y-2'
                 : isActive
                 ? 'text-emerald-700'
-                : 'text-gray-500 hover:text-emerald-600'
+                : 'text-gray-600 hover:text-emerald-600'
             } transition-all duration-300`
           }
           aria-label={item.ariaLabel}
@@ -58,15 +67,15 @@ function Navbar() {
             initial="initial"
             animate="animate"
             whileHover={{
-              scale: item.name === 'Transfer' ? 1.1 : 1.2,
+              scale: item.name === 'Transfer' ? 1.1 : 1.15,
               rotate: item.name === 'Transfer' ? 360 : 0,
             }}
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className={`text-2xl relative ${
+            className={`text-xl relative ${
               item.name === 'Transfer'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-full shadow-lg ring-4 ring-emerald-200/50'
-                : 'p-2 rounded-full group-hover:bg-emerald-100/50'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-3 rounded-full shadow-lg ring-2 ring-emerald-200/50'
+                : 'p-2 rounded-full group-hover:bg-gradient-to-r group-hover:from-emerald-50 group-hover:to-teal-50'
             }`}
           >
             {item.icon}
@@ -87,12 +96,10 @@ function Navbar() {
           >
             {item.name}
           </span>
-          {/* Active state indicator */}
           <motion.div
-            className={`absolute -bottom-2 w-6 h-1 rounded-full ${
-              item.name === 'Transfer' ? 'bg-emerald-600' : 'bg-emerald-500'
-            } opacity-0`}
-            animate={{ opacity: ({ isActive }) => (isActive || item.name === 'Transfer' ? 1 : 0) }}
+            className="absolute -bottom-2 w-6 h-1 rounded-full bg-emerald-500"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: location.pathname === item.path || item.name === 'Transfer' ? 1 : 0 }}
             transition={{ duration: 0.3 }}
           />
         </NavLink>

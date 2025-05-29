@@ -20,6 +20,7 @@ export const homeData = {
     { type: "in", from: "Joko", amount: "Rp 1,000,000", date: "28 Mei 2025, 16:00 WIB", isNew: true },
     { type: "in", from: "Rina", amount: "Rp 750,000", date: "27 Mei 2025, 12:45 WIB", isNew: false }
   ],
+  
   eventNews: [
     { title: "Pembaruan Kebijakan", status: "Baru" },
     { title: "Promo Baru: Diskon 20%", status: "Baru" },
