@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Monitoring Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: #fff; transition: transform 0.3s ease; z-index: 1000;
+        }
+        .sidebar-closed { transform: translateX(-260px); }
+        .content-wrapper { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .sidebar-closed + .content-wrapper { margin-left: 0; }
+        .card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .notification-dropdown { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); max-height: 320px; overflow-y: auto; }
+        .table th, .table td { padding: 16px; }
+        .table tbody tr { transition: background 0.2s; }
+        .table tbody tr:hover { background: rgba(20, 184, 166, 0.1); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 100; justify-content: center; align-items: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); transform: translateY(20px); transition: transform 0.3s ease; }
+        .modal.show .modal-content { transform: translateY(0); }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-260px); }
+            .sidebar-open { transform: translateX(0); }
+            .content-wrapper { margin-left: 0; }
+            .table { display: block; overflow-x: auto; }
+        }
+        .btn { transition: background 0.2s, transform 0.1s; }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <aside id="sidebar" class="sidebar">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-white flex items-center"><i class="fas fa-tachometer-alt mr-2"></i> Admin Dashboard</h1>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('main')"><i class="fas fa-home mr-3 text-lg"></i> Dashboard</a></li>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('users')"><i class="fas fa-users mr-3 text-lg"></i> Nasabah</a></li>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('sensors')"><i class="fas fa-thermometer-half mr-3 text-lg"></i> Pemilik Sensor</a></li>
+                <!-- <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('dam')"><i class="fas fa-water mr-3 text-lg"></i> Data Dam</a></li> -->
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('transactions')"><i class="fas fa-money-bill-wave mr-3 text-lg"></i> Transaksi</a></li>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('waste_reports')"><i class="fas fa-exclamation-triangle mr-3 text-lg"></i> Laporan Sampah</a></li>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('schedules')"><i> Jadwal</a></li>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('activities')"><i class="fas fa-list mr-3 text-lg"></i> Aktivitas</a></li>
+                <li><a href="#" class="flex items-center p-4 hover:bg-teal-600" onclick="navigateTo('profile')"><i class="fas fa-user mr-3 text-lg"></i> Profil Admin</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="content-wrapper p-6">
+        <header class="sticky top-0 bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-lg p-4 flex justify-between items-center z-10 rounded-xl">
+            <button id="sidebar-toggle" class="text-slate-700 hover:text-teal-600"><i class="fas fa-bars text-2xl"></i></button>
+            <div class="flex items-center space-x-4">
+                <h1 id="header-title" class="text-xl font-semibold text-slate-800">Selamat Sore, Admin</h1>
+                <div class="relative">
+                    <button id="notification-btn" class="p-2 rounded-full bg-amber-100 hover:bg-amber-200"><i class="fas fa-bell text-amber-600"></i></button>
+                    <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 notification-dropdown border border-teal-200">
+                        <div class="flex justify-between items-center p-4 border-b border-teal-200">
+                            <h3 class="text-sm font-semibold text-slate-800">Notifikasi</h3>
+                            <button id="close-notification" class="text-slate-500 hover:text-slate-700"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div id="notification-list" class="p-2 space-y-2"></div>
+                        <p class="text-xs text-slate-500 p-4 text-center">Terakhir diperbarui 02 Jun 2025, 15:42 WIB</p>
+                    </div>
+                </div>
+                <button class="p-2 rounded-full bg-teal-100 hover:bg-teal-200" onclick="navigateTo('profile')"><i class="fas fa-cog text-teal-600"></i></button>
+            </div>
+        </header>
+
+        <main id="main-content" class="mt-6">
+            <div id="loading" class="hidden flex items-center justify-center h-screen"><i class="fas fa-sync-alt text-4xl text-teal-600 animate-spin"></i></div>
+            <div id="dashboard-main" class="space-y-6">
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold text-slate-800 mb-6">Ringkasan Sistem</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                        <div class="card p-4"><i class="fas fa-users text-2xl text-teal-600 mb-2"></i><p class="text-sm text-slate-600">Total Nasabah</p><p id="total-users" class="text-xl font-semibold text-slate-800"></p></div>
+                        <div class="card p-4"><i class="fas fa-money-bill-wave text-2xl text-teal-600 mb-2"></i><p class="text-sm text-slate-600">Total Saldo</p><p id="total-balance" class="text-xl font-semibold text-slate-800"></p></div>
+                        <div class="card p-4"><i class="fas fa-thermometer-half text-2xl text-teal-600 mb-2"></i><p class="text-sm text-slate-600">Total Sensor</p><p id="total-sensors" class="text-xl font-semibold text-slate-800"></p></div>
+                        <div class="card p-4"><i class="fas fa-water text-2xl text-teal-600 mb-2"></i><p class="text-sm text-slate-600">Dam Aktif</p><p id="active-dams" class="text-xl font-semibold text-slate-800"></p></div>
+                        <div class="card p-4"><i class="fas fa-bell text-2xl text-amber-600 mb-2"></i><p class="text-sm text-slate-600">Notifikasi</p><p id="total-notifications" class="text-xl font-semibold text-slate-800"></p></div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-slate-800">Pemilik Sensor</h2>
+                        <div class="flex space-x-2">
+                            <select id="sensor-type-filter" class="px-3 py-2 border border-teal-200 rounded-lg text-sm bg-white bg-opacity-80">
+                                <option value="">Semua Tipe</option>
+                                <option value="Temperature">Suhu</option>
+                                <option value="Humidity">Kelembapan</option>
+                                <option value="Capacity">Kapasitas</option>
+                            </select>
+                            <input id="sensor-search" type="text" placeholder="Cari pemilik..." class="px-3 py-2 border border-teal-200 rounded-lg text-sm bg-white bg-opacity-80">
+                        </div>
+                    </div>
+                    <div class="table">
+                        <table class="w-full text-sm text-slate-700">
+                            <thead>
+                                <tr class="bg-teal-50 text-left">
+                                    <th class="cursor-pointer" onclick="sortTable('sensor-owners', 'userName')">Nasabah <i class="fas fa-sort"></i></th>
+                                    <th>Sensor ID</th>
+                                    <th>Tipe</th>
+                                    <th>Status</th>
+                                    <th>Terakhir Dibaca</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sensor-owners"></tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-center mt-6 space-x-3" id="sensor-pagination"></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-slate-800">Data Dam</h2>
+                        <div class="flex space-x-2">
+                            <select id="dam-status-filter" class="px-3 py-2 border border-teal-200 rounded-lg text-sm bg-white bg-opacity-80">
+                                <option value="">Semua Status</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Warning">Peringatan</option>
+                                <option value="Critical">Kritis</option>
+                            </select>
+                            <input id="dam-search" type="text" placeholder="Cari dam..." class="px-3 py-2 border border-teal-200 rounded-lg text-sm bg-white bg-opacity-80">
+                        </div>
+                    </div>
+                    <div class="table">
+                        <table class="w-full text-sm text-slate-700">
+                            <thead>
+                                <tr class="bg-teal-50 text-left">
+                                    <th>Dam ID</th>
+                                    <th class="cursor-pointer" onclick="sortTable('dam-data', 'location')">Lokasi <i class="fas fa-sort"></i></th>
+                                    <th>Tinggi Air (m)</th>
+                                    <th>Laju Alir (m³/s)</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dam-data"></tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-center mt-6 space-x-3" id="dam-pagination"></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-slate-800">Daftar Nasabah</h2>
+                        <div class="flex space-x-2">
+                            <select id="user-status-filter" class="px-3 py-2 border border-teal-200 rounded-lg text-sm bg-white bg-opacity-80">
+                                <option value="">Semua Status</option>
+                                <option value="Aktif">Aktif</option>
+                                <option value="Nonaktif">Nonaktif</option>
+                            </select>
+                            <input id="user-search" type="text" placeholder="Cari nasabah..." class="px-3 py-2 border border-teal-200 rounded-lg text-sm bg-white bg-opacity-80">
+                        </div>
+                    </div>
+                    <div class="table">
+                        <table class="w-full text-sm text-slate-700">
+                            <thead>
+                                <tr class="bg-teal-50 text-left">
+                                    <th class="cursor-pointer" onclick="sortTable('users-table', 'userName')">Nama <i class="fas fa-sort"></i></th>
+                                    <th>Rekening</th>
+                                    <th>Saldo</th>
+                                    <th>Status</th>
+                                    <th>Terakhir Login</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-center mt-6 space-x-3" id="users-pagination"></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-slate-800">Transaksi Terbaru</h2>
+                        <p class="text-xs text-slate-500">Terakhir diperbarui 02 Jun 2025, 15:42 WIB</p>
+                    </div>
+                    <div id="transactions" class="space-y-3"></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-slate-800">Aktivitas Terbaru</h2>
+                        <p class="text-xs text-slate-500">Terakhir diperbarui 02 Jun 2025, 15:42 WIB</p>
+                    </div>
+                    <div id="activities" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div id="sub-dashboard" class="hidden space-y-6">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="sub-dashboard-title" class="text-xl font-semibold text-slate-800"></h2>
+                        <button onclick="navigateTo('main')" class="btn px-4 py-2 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200">Kembali</button>
+                    </div>
+                    <div id="sub-dashboard-content" class="space-y-4"></div>
+                </div>
+            </div>
+        </main>
+
+        <div id="user-modal" class="modal">
+            <div class="modal-content p-6 w-full max-w-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-slate-800">Detail Nasabah</h3>
+                    <button onclick="closeModal('user-modal')" class="text-slate-500 hover:text-slate-700"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="user-detail" class="space-y-4 text-sm text-slate-700"></div>
+            </div>
+        </div>
+        <div id="sensor-modal" class="modal">
+            <div class="modal-content p-6 w-full max-w-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-slate-800">Detail Sensor</h3>
+                    <button onclick="closeModal('sensor-modal')" class="text-slate-500 hover:text-slate-700"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="sensor-detail" class="space-y-4 text-sm text-slate-700"></div>
+            </div>
+        </div>
+        <div id="dam-modal" class="modal">
+            <div class="modal-content p-6 w-full max-w-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-slate-800">Detail Dam</h3>
+                    <button onclick="closeModal('dam-modal')" class="text-slate-500 hover:text-slate-700"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="dam-detail" class="space-y-4 text-sm text-slate-700"></div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-sm text-slate-500">
+            <p>© 2025 Monitoring App. Seluruh hak cipta dilindungi.</p>
+        </footer>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        let currentPage = { users: 1, sensors: 1, dam: 1 };
+        const itemsPerPage = 5;
+        let filters = { userStatus: '', sensorType: '', damStatus: '', userSearch: '', sensorSearch: '', damSearch: '' };
+        let sortState = { 'users-table': { column: 'userName', order: 'asc' }, 'sensor-owners': { column: 'userName', order: 'asc' }, 'dam-data': { column: 'location', order: 'asc' } };
+        let currentDashboard = 'main';
+
+        const elements = {
+            sidebar: document.getElementById('sidebar'),
+            sidebarToggle: document.getElementById('sidebar-toggle'),
+            contentWrapper: document.querySelector('.content-wrapper'),
+            headerTitle: document.getElementById('header-title'),
+            notificationBtn: document.getElementById('notification-btn'),
+            notificationDropdown: document.getElementById('notification-dropdown'),
+            closeNotification: document.getElementById('close-notification'),
+            notificationList: document.getElementById('notification-list'),
+            totalUsers: document.getElementById('total-users'),
+            totalBalance: document.getElementById('total-balance'),
+            totalSensors: document.getElementById('total-sensors'),
+            activeDams: document.getElementById('active-dams'),
+            totalNotifications: document.getElementById('total-notifications'),
+            usersTable: document.getElementById('users-table'),
+            usersPagination: document.getElementById('users-pagination'),
+            sensorOwners: document.getElementById('sensor-owners'),
+            sensorPagination: document.getElementById('sensor-pagination'),
+            damData: document.getElementById('dam-data'),
+            damPagination: document.getElementById('dam-pagination'),
+            userSearch: document.getElementById('user-search'),
+            userStatusFilter: document.getElementById('user-status-filter'),
+            sensorSearch: document.getElementById('sensor-search'),
+            sensorTypeFilter: document.getElementById('sensor-type-filter'),
+            damSearch: document.getElementById('dam-search'),
+            damStatusFilter: document.getElementById('dam-status-filter'),
+            transactions: document.getElementById('transactions'),
+            activities: document.getElementById('activities'),
+            mainContent: document.getElementById('main-content'),
+            dashboardMain: document.getElementById('dashboard-main'),
+            subDashboard: document.getElementById('sub-dashboard'),
+            subDashboardTitle: document.getElementById('sub-dashboard-title'),
+            subDashboardContent: document.getElementById('sub-dashboard-content'),
+            loading: document.getElementById('loading'),
+        };
+
+        function init() {
+            elements.loading.classList.remove('hidden');
+            setTimeout(() => {
+                elements.loading.classList.add('hidden');
+                renderMain();
+            }, 1000);
+            bindEvents();
+        }
+
+        function bindEvents() {
+            elements.sidebarToggle.addEventListener('click', toggleSidebar);
+            elements.notificationBtn.addEventListener('click', () => elements.notificationDropdown.classList.toggle('hidden'));
+            elements.closeNotification.addEventListener('click', () => elements.notificationDropdown.classList.add('hidden'));
+            elements.userSearch.addEventListener('input', () => { filters.userSearch = elements.userSearch.value.toLowerCase(); currentPage.users = 1; renderMain(); });
+            elements.userStatusFilter.addEventListener('change', () => { filters.userStatus = elements.userStatusFilter.value; currentPage.users = 1; renderMain(); });
+            elements.sensorSearch.addEventListener('input', () => { filters.sensorSearch = elements.sensorSearch.value.toLowerCase(); currentPage.sensors = 1; renderMain(); });
+            elements.sensorTypeFilter.addEventListener('change', () => { filters.sensorType = elements.sensorTypeFilter.value; currentPage.sensors = 1; renderMain(); });
+            elements.damSearch.addEventListener('input', () => { filters.damSearch = elements.damSearch.value.toLowerCase(); currentPage.dam = 1; renderMain(); });
+            elements.damStatusFilter.addEventListener('change', () => { filters.damStatus = elements.damStatusFilter.value; currentPage.dam = 1; renderMain(); });
+        }
+
+        function toggleSidebar() {
+            elements.sidebar.classList.toggle('sidebar-closed');
+            elements.sidebar.classList.toggle('sidebar-open', window.innerWidth <= 768);
+            elements.contentWrapper.classList.toggle('sidebar-closed');
+        }
+
+        function navigateTo(dashboard) {
+            currentDashboard = dashboard;
+            elements.mainContent.scrollTop = 0;
+            if (dashboard === 'main') {
+                elements.dashboardMain.classList.remove('hidden');
+                elements.subDashboard.classList.add('hidden');
+                renderMain();
+            } else if (dashboard === 'profile') {
+                window.location.href = 'profile.html';
+            } else {
+                elements.dashboardMain.classList.add('hidden');
+                elements.subDashboard.classList.remove('hidden');
+                renderSubDashboard(dashboard);
+            }
+        }
+
+        function calculateAggregates() {
+            const filteredUsers = usersData.filter(user =>
+                (!filters.userStatus || user.status === filters.userStatus) &&
+                (user.userName.toLowerCase().includes(filters.userSearch) || user.accountNumber.includes(filters.userSearch))
+            );
+            const totalBalance = filteredUsers.reduce((sum, user) => sum + parseFloat(user.balance.replace(/[^0-9,-]+/g, '').replace(',', '.')), 0);
+            const allSensors = filteredUsers.flatMap(user => user.sensors.map(s => ({ ...s, userName: user.userName })))
+                .filter(sensor => (!filters.sensorType || sensor.type === filters.sensorType) &&
+                    (sensor.id.toLowerCase().includes(filters.sensorSearch) || sensor.userName.toLowerCase().includes(filters.sensorSearch)));
+            const allDams = damData.filter(dam =>
+                (!filters.damStatus || dam.status === filters.damStatus) &&
+                (dam.id.toLowerCase().includes(filters.damSearch) || dam.location.toLowerCase().includes(filters.damSearch))
+            );
+            return {
+                totalUsers: filteredUsers.length,
+                totalBalance: `Rp${totalBalance.toLocaleString('id-ID')}`,
+                totalSensors: allSensors.length,
+                activeDams: allDams.filter(d => d.status === 'Normal').length,
+                totalNotifications: filteredUsers.reduce((sum, user) => sum + user.notifications.length, 0),
+                filteredUsers,
+                filteredSensors: allSensors,
+                filteredDams: allDams,
+            };
+        }
+
+        function renderMain() {
+            elements.headerTitle.textContent = 'Selamat Sore, Admin';
+            const aggregates = calculateAggregates();
+            elements.totalUsers.textContent = aggregates.totalUsers;
+            elements.totalBalance.textContent = aggregates.totalBalance;
+            elements.totalSensors.textContent = aggregates.totalSensors;
+            elements.activeDams.textContent = aggregates.activeDams;
+            elements.totalNotifications.textContent = aggregates.totalNotifications;
+
+            const notifications = usersData.flatMap(user => user.notifications.map(n => ({ ...n, userName: user.userName })))
+                .sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+            elements.notificationList.innerHTML = notifications.map(n => `
+                <div class="flex items-center justify-between p-3 rounded-lg border-b border-teal-100 cursor-pointer hover:bg-teal-50">
+                    <div class="flex items-center">
+                        <i class="fas fa-bell text-amber-600 mr-3 text-sm"></i>
+                        <p class="text-sm text-slate-600">${n.userName}: ${n.message}</p>
+                    </div>
+                    <span class="text-xs font-medium text-teal-600" onclick="navigateTo('${n.dashboard}')">Lihat</span>
+                </div>
+            `).join('');
+
+            const sortedUsers = aggregates.filteredUsers.sort((a, b) => {
+                const valA = a[sortState['users-table'].column];
+                const valB = b[sortState['users-table'].column];
+                return sortState['users-table'].order === 'asc' ? (valA < valB ? -1 : 1) : (valA > valB ? -1 : 1);
+            });
+            const paginatedUsers = sortedUsers.slice((currentPage.users - 1) * itemsPerPage, currentPage.users * itemsPerPage);
+            elements.usersTable.innerHTML = paginatedUsers.map(user => `
+                <tr class="border-b border-teal-100">
+                    <td>${user.userName}</td>
+                    <td>${user.accountNumber}</td>
+                    <td>${user.balance}</td>
+                    <td><span class="px-2 py-1 rounded-full text-xs ${user.status === 'Aktif' ? 'bg-teal-100 text-teal-600' : 'bg-red-100 text-red-600'}">${user.status}</span></td>
+                    <td>${user.lastLogin}</td>
+                    <td class="flex space-x-2">
+                        <button class="btn px-4 py-1 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200" onclick="viewUserDetail('${user.userId}')">Detail</button>
+                        <button class="btn px-4 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" onclick="deactivateUser('${user.userId}')">Nonaktif</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const totalUserPages = Math.ceil(aggregates.filteredUsers.length / itemsPerPage);
+            elements.usersPagination.innerHTML = Array.from({ length: totalUserPages }, (_, i) => i + 1).map(page => `
+                <button onclick="changePage('users', ${page})" class="btn px-4 py-2 rounded-lg ${currentPage.users === page ? 'bg-teal-600 text-white' : 'bg-teal-100 text-teal-600'} hover:bg-teal-200">${page}</button>
+            `).join('');
+
+            const sortedSensors = aggregates.filteredSensors.sort((a, b) => {
+                const valA = a[sortState['sensor-owners'].column];
+                const valB = b[sortState['sensor-owners'].column];
+                return sortState['sensor-owners'].order === 'asc' ? (valA < valB ? -1 : 1) : (valA > valB ? -1 : 1);
+            });
+            const paginatedSensors = sortedSensors.slice((currentPage.sensors - 1) * itemsPerPage, currentPage.sensors * itemsPerPage);
+            elements.sensorOwners.innerHTML = paginatedSensors.map(sensor => `
+                <tr class="border-b border-teal-100">
+                    <td>${sensor.userName}</td>
+                    <td>${sensor.id}</td>
+                    <td>${sensor.type}</td>
+                    <td><span class="px-2 py-1 rounded-full text-xs ${sensor.status === 'Active' ? 'bg-teal-100 text-teal-600' : 'bg-red-100 text-red-600'}">${sensor.status}</span></td>
+                    <td>${sensor.lastReading}</td>
+                    <td><button class="btn px-4 py-1 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200" onclick="viewSensorDetail('${sensor.id}')">Detail</button></td>
+                </tr>
+            `).join('');
+
+            const totalSensorPages = Math.ceil(aggregates.filteredSensors.length / itemsPerPage);
+            elements.sensorPagination.innerHTML = Array.from({ length: totalSensorPages }, (_, i) => i + 1).map(page => `
+                <button onclick="changePage('sensors', ${page})" class="btn px-4 py-2 rounded-lg ${currentPage.sensors === page ? 'bg-teal-600 text-white' : 'bg-teal-100 text-teal-600'} hover:bg-teal-200">${page}</button>
+            `).join('');
+
+            const sortedDams = aggregates.filteredDams.sort((a, b) => {
+                const valA = a[sortState['dam-data'].column];
+                const valB = b[sortState['dam-data'].column];
+                return sortState['dam-data'].order === 'asc' ? (valA < valB ? -1 : 1) : (valA > valB ? -1 : 1);
+            });
+            const paginatedDams = sortedDams.slice((currentPage.dam - 1) * itemsPerPage, currentPage.dam * itemsPerPage);
+            elements.damData.innerHTML = paginatedDams.map(dam => `
+                <tr class="border-b border-teal-100">
+                    <td>${dam.id}</td>
+                    <td>${dam.location}</td>
+                    <td>${dam.waterLevel}</td>
+                    <td>${dam.flowRate}</td>
+                    <td><span class="px-2 py-1 rounded-full text-xs ${dam.status === 'Normal' ? 'bg-teal-100 text-teal-600' : dam.status === 'Warning' ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'}">${dam.status}</span></td>
+                    <td><button class="btn px-4 py-1 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200" onclick="viewDamDetail('${dam.id}')">Detail</button></td>
+                </tr>
+            `).join('');
+
+            const totalDamPages = Math.ceil(aggregates.filteredDams.length / itemsPerPage);
+            elements.damPagination.innerHTML = Array.from({ length: totalDamPages }, (_, i) => i + 1).map(page => `
+                <button onclick="changePage('dam', ${page})" class="btn px-4 py-2 rounded-lg ${currentPage.dam === page ? 'bg-teal-600 text-white' : 'bg-teal-100 text-teal-600'} hover:bg-teal-200">${page}</button>
+            `).join('');
+
+            const recentTransactions = aggregates.filteredUsers.flatMap(user => user.transactions.map(tx => ({ ...tx, userName: user.userName })))
+                .sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            elements.transactions.innerHTML = recentTransactions.map(tx => `
+                <div class="card p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas ${tx.type === 'out' ? 'fa-arrow-up text-red-500' : 'fa-arrow-down text-teal-600'} mr-3 text-lg"></i>
+                        <div>
+                            <p class="text-sm font-medium text-slate-700">${tx.userName}: ${tx.description}</p>
+                            <p class="text-sm font-semibold ${tx.type === 'out' ? 'text-red-500' : 'text-teal-600'}">${tx.amount}</p>
+                            <p class="text-xs text-slate-500">${tx.date}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold text-teal-600 bg-teal-100 px-2 py-1 rounded-full">${tx.status}</span>
+                </div>
+            `).join('');
+
+            const recentActivities = aggregates.filteredUsers.flatMap(user => user.activities.map(act => ({ ...act, userName: user.userName })))
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+            elements.activities.innerHTML = recentActivities.map(act => `
+                <div class="card p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle text-teal-600 mr-3 text-lg"></i>
+                        <div>
+                            <p class="text-sm font-medium text-slate-700">${act.userName}: ${act.description}</p>
+                            <p class="text-xs text-slate-500">${act.timestamp} | IP: ${act.ip}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold text-teal-600 bg-teal-100 px-2 py-1 rounded-full">${act.category}</span>
+                </div>
+            `).join('');
+        }
+
+        function changePage(type, page) {
+            currentPage[type] = page;
+            renderMain();
+        }
+
+        function sortTable(tableId, column) {
+            const state = sortState[tableId];
+            state.order = state.column === column && state.order === 'asc' ? 'desc' : 'asc';
+            state.column = column;
+            renderMain();
+        }
+
+        function viewUserDetail(userId) {
+            const user = usersData.find(u => u.userId === userId);
+            document.getElementById('user-detail').innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><p class="font-semibold">Nama:</p><p>${user.userName}</p></div>
+                    <div><p class="font-semibold">Rekening:</p><p>${user.accountNumber}</p></div>
+                    <div><p class="font-semibold">Saldo:</p><p>${user.balance}</p></div>
+                    <div><p class="font-semibold">Status:</p><p>${user.status}</p></div>
+                    <div><p class="font-semibold">Email:</p><p>${user.email}</p></div>
+                    <div><p class="font-semibold">Telepon:</p><p>${user.phone}</p></div>
+                    <div><p class="font-semibold">Registrasi:</p><p>${user.registrationDate}</p></div>
+                    <div><p class="font-semibold">Terakhir Login:</p><p>${user.lastLogin}</p></div>
+                    <div><p class="font-semibold">Perangkat:</p><p>${user.deviceInfo}</p></div>
+                    <div><p class="font-semibold">Sensor:</p><p>${user.sensors.length ? user.sensors.map(s => s.id).join(', ') : 'Tidak ada'}</p></div>
+                </div>
+            `;
+            document.getElementById('user-modal').classList.add('show');
+        }
+
+        function viewSensorDetail(sensorId) {
+            const sensor = usersData.flatMap(u => u.sensors).find(s => s.id === sensorId);
+            document.getElementById('sensor-detail').innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><p class="font-semibold">Sensor ID:</p><p>${sensor.id}</p></div>
+                    <div><p class="font-semibold">Pemilik:</p><p>${sensor.userName}</p></div>
+                    <div><p class="font-semibold">Tipe:</p><p>${sensor.type}</p></div>
+                    <div><p class="font-semibold">Status:</p><p>${sensor.status}</p></div>
+                    <div><p class="font-semibold">Terakhir Dibaca:</p><p>${sensor.lastReading}</p></div>
+                    <div><p class="font-semibold">Data Terbaru:</p><p>Suhu: ${sensor.data.temperature} °C, Kelembapan: ${sensor.data.humidity} %, Kapasitas: ${sensor.data.capacity} %</p></div>
+                </div>
+            `;
+            document.getElementById('sensor-modal').classList.add('show');
+        }
+
+        function viewDamDetail(damId) {
+            const dam = damData.find(d => d.id === damId);
+            document.getElementById('dam-detail').innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><p class="font-semibold">ID:</p><p>${dam.id}</p></div>
+                    <div><p class="font-semibold">Lokasi:</p><p>${dam.location}</p></div>
+                    <div><p class="font-semibold">Tinggi Air:</p><p>${dam.waterLevel} m</p></div>
+                    <div><p class="font-semibold">Laju Alir:</p><p>${dam.flowRate} m³/s</p></div>
+                    <div><p class="font-semibold">Kapasitas Maksimum:</p><p>${dam.maxCapacity} m</p></div>
+                    <div><p class="font-semibold">Status:</p><p>${dam.status}</p></div>
+                    <div><p class="font-semibold">Terakhir Diperbarui:</p><p>${dam.lastUpdated}</p></div>
+                </div>
+            `;
+            document.getElementById('dam-modal').classList.add('show');
+        }
+
+        function deactivateUser(userId) {
+            if (!confirm('Nonaktifkan nasabah?')) return;
+            const user = usersData.find(u => u.userId === userId);
+            user.status = 'Nonaktif';
+            renderMain();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function renderSubDashboard(dashboard) {
+            elements.subDashboardTitle.textContent = dashboardMap[dashboard].title;
+            let data = dashboardMap[dashboard].getData();
+            if (sortState[dashboard]) {
+                data.sort((a, b) => {
+                    const valA = a[sortState[dashboard].column] || '';
+                    const valB = b[sortState[dashboard].column] || '';
+                    return sortState[dashboard].order === 'asc' ? (valA < valB ? -1 : 1) : (valA > valB ? -1 : 1);
+                });
+            }
+            elements.subDashboardContent.innerHTML = data.map((item, index) => `
+                <div class="card p-4 ${index % 2 === 0 ? 'bg-white bg-opacity-80' : 'bg-teal-50 bg-opacity-80'}">
+                    ${dashboardMap[dashboard].renderItem(item)}
+                </div>
+            `).join('');
+        }
+
+        const dashboardMap = {
+            users: {
+                title: 'Daftar Nasabah',
+                getData: () => usersData.filter(u => (!filters.userStatus || u.status === filters.userStatus) &&
+                    (u.userName.toLowerCase().includes(filters.userSearch) || u.accountNumber.includes(filters.userSearch))),
+                renderItem: u => `
+                    <p class="text-sm font-semibold text-slate-800">${u.userName}</p>
+                    <p class="text-sm text-slate-600">Rekening: ${u.accountNumber}</p>
+                    <p class="text-sm text-slate-600">Saldo: ${u.balance}</p>
+                    <p class="text-sm text-slate-600">Status: ${u.status}</p>
+                    <p class="text-sm text-slate-600">Email: ${u.email}</p>
+                    <p class="text-sm text-slate-600">Telepon: ${u.phone}</p>
+                    <p class="text-sm text-slate-600">Registrasi: ${u.registrationDate}</p>
+                    <p class="text-sm text-slate-600">Terakhir Login: ${u.lastLogin}</p>
+                    <p class="text-sm text-slate-600">Perangkat: ${u.deviceInfo}</p>
+                `,
+            },
+            sensors: {
+                title: 'Pemilik Sensor',
+                getData: () => usersData.flatMap(u => u.sensors.map(s => ({ ...s, userName: u.userName })))
+                    .filter(s => (!filters.sensorType || s.type === filters.sensorType) &&
+                        (s.id.toLowerCase().includes(filters.sensorSearch) || s.userName.toLowerCase().includes(filters.sensorSearch))),
+                renderItem: s => `
+                    <p class="text-sm font-semibold text-slate-800">${s.userName}</p>
+                    <p class="text-sm text-slate-600">Sensor ID: ${s.id}</p>
+                    <p class="text-sm text-slate-600">Tipe: ${s.type}</p>
+                    <p class="text-sm text-slate-600">Status: ${s.status}</p>
+                    <p class="text-sm text-slate-600">Terakhir Dibaca: ${s.lastReading}</p>
+                    <p class="text-sm text-slate-600">Data: Suhu ${s.data.temperature} °C, Kelembapan ${s.data.humidity} %, Kapasitas ${s.data.capacity} %</p>
+                `,
+            },
+            dam: {
+                title: 'Data Dam',
+                getData: () => damData.filter(d => (!filters.damStatus || d.status === filters.damStatus) &&
+                    (d.id.toLowerCase().includes(filters.damSearch) || d.location.toLowerCase().includes(filters.damSearch))),
+                renderItem: d => `
+                    <p class="text-sm font-semibold text-slate-800">${d.id}</p>
+                    <p class="text-sm text-slate-600">Lokasi: ${d.location}</p>
+                    <p class="text-sm text-slate-600">Tinggi Air: ${d.waterLevel} m</p>
+                    <p class="text-sm text-slate-600">Laju Alir: ${d.flowRate} m³/s</p>
+                    <p class="text-sm text-slate-600">Kapasitas Maksimum: ${d.maxCapacity} m</p>
+                    <p class="text-sm text-slate-600">Status: ${d.status}</p>
+                    <p class="text-sm text-slate-600">Terakhir Diperbarui: ${d.lastUpdated}</p>
+                `,
+            },
+            transactions: {
+                title: 'Transaksi',
+                getData: () => usersData.flatMap(u => u.transactions.map(tx => ({ ...tx, userName: u.userName })))
+                    .sort((a, b) => new Date(b.date) - new Date(a.date)),
+                renderItem: tx => `
+                    <p class="text-sm font-semibold text-slate-800">${tx.userName}: ${tx.description}</p>
+                    <p class="text-sm text-slate-600">ID: ${tx.id}</p>
+                    <p class="text-sm text-slate-600">Jumlah: ${tx.amount}</p>
+                    <p class="text-sm text-slate-600">Tanggal: ${tx.date}</p>
+                    <p class="text-sm text-slate-600">Kategori: ${tx.category}</p>
+                    <p class="text-sm text-slate-600">Status: ${tx.status}</p>
+                `,
+            },
+            waste_reports: {
+                title: 'Laporan Sampah',
+                getData: () => usersData.flatMap(u => u.wasteReports.map(r => ({ ...r, userName: u.userName }))),
+                renderItem: r => `
+                    <p class="text-sm font-semibold text-slate-800">${r.userName}: ${r.id}</p>
+                    <p class="text-sm text-slate-600">Tipe: ${r.type}</p>
+                    <p class="text-sm text-slate-600">Lokasi: ${r.location}</p>
+                    <p class="text-sm text-slate-600">Status: ${r.status}</p>
+                    <p class="text-sm text-slate-600">Tanggal: ${r.date}</p>
+                `,
+            },
+            schedules: {
+                title: 'Jadwal Pengangkutan',
+                getData: () => usersData.flatMap(u => u.schedules.map(s => ({ ...s, userName: u.userName }))),
+                renderItem: s => `
+                    <p class="text-sm font-semibold text-slate-800">${s.userName}</p>
+                    <p class="text-sm text-slate-600">ID: ${s.id}</p>
+                    <p class="text-sm text-slate-600">Tanggal: ${s.date}</p>
+                    <p class="text-sm text-slate-600">Waktu: ${s.time}</p>
+                    <p class="text-sm text-slate-600">Lokasi: ${s.location}</p>
+                    <p class="text-sm text-slate-600">Prioritas: ${s.priority}</p>
+                `,
+            },
+            activities: {
+                title: 'Log Aktivitas',
+                getData: () => usersData.flatMap(u => u.activities.map(a => ({ ...a, userName: u.userName })))
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)),
+                renderItem: a => `
+                    <p class="text-sm font-semibold text-slate-800">${a.userName}: ${a.description}</p>
+                    <p class="text-sm text-slate-600">Kategori: ${a.category}</p>
+                    <p class="text-sm text-slate-600">Waktu: ${a.timestamp}</p>
+                    <p class="text-sm text-slate-600">IP: ${a.ip}</p>
+                `,
+            },
+        };
+
+        init();
+    </script>
+</body>
+</html>
