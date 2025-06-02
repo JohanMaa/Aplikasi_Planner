@@ -4,7 +4,7 @@ import { FaTemperatureHigh, FaTint, FaRulerVertical } from 'react-icons/fa';
 
 // Unified JSON data
 const sensorData = [
-  { id: 1, timestamp: '2025-05-29 11:30 AM', temperature: 28.5, humidity: 64, height: 1.2 },
+  { id: 1, timestamp: '2025-05-29 11:30 AM', temperature: 28.5, humidity: 64, height: 20 },
   { id: 2, timestamp: '2025-05-29 11:00 AM', temperature: 28.7, humidity: 66, height: 1.19 },
   { id: 3, timestamp: '2025-05-29 10:30 AM', temperature: 27.9, humidity: 63, height: 1.17 },
   { id: 4, timestamp: '2025-05-29 10:00 AM', temperature: 28.0, humidity: 65, height: 1.20 },
@@ -85,7 +85,7 @@ function Compose() {
           {[
             { label: 'Suhu', value: `${currentData.temperature} °C`, icon: <FaTemperatureHigh className="w-8 h-8 text-teal-600" /> },
             { label: 'Kelembapan', value: `${currentData.humidity} %`, icon: <FaTint className="w-8 h-8 text-teal-600" /> },
-            { label: 'Kedalaman', value: `${currentData.height} m`, icon: <FaRulerVertical className="w-8 h-8 text-teal-600" /> },
+            { label: 'Kapasitas', value: `${currentData.height} %`, icon: <FaRulerVertical className="w-8 h-8 text-teal-600" /> },
           ].map((item, index) => (
             <motion.div
               key={item.label}

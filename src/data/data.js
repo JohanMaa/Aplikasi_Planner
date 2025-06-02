@@ -4,9 +4,9 @@ export const users = [
 ];
 
 export const homeData = {
-  userName: "Manusia",
+  userName: "Nasabah",
   accountNumber: "1111-2222-3333-44",
-  balance: "Rp 10,000,000",
+  balance: "Rp 10,000,00",
   email: "manusi@example.com",
   phone: "+62 1111 2222 33333",
   address: "JAWA, Indonesia",
