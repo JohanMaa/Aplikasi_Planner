@@ -5,12 +5,12 @@ import { FaTemperatureHigh, FaTint, FaRulerVertical } from 'react-icons/fa';
 // Unified JSON data
 const sensorData = [
   { id: 1, timestamp: '2025-05-29 11:30 AM', temperature: 28.5, humidity: 64, height: 20 },
-  { id: 2, timestamp: '2025-05-29 11:00 AM', temperature: 28.7, humidity: 66, height: 1.19 },
-  { id: 3, timestamp: '2025-05-29 10:30 AM', temperature: 27.9, humidity: 63, height: 1.17 },
-  { id: 4, timestamp: '2025-05-29 10:00 AM', temperature: 28.0, humidity: 65, height: 1.20 },
-  { id: 5, timestamp: '2025-05-29 09:30 AM', temperature: 27.8, humidity: 62, height: 1.16 },
-  { id: 6, timestamp: '2025-05-29 09:00 AM', temperature: 28.1, humidity: 64, height: 1.15 },
-  { id: 7, timestamp: '2025-05-29 08:30 AM', temperature: 27.7, humidity: 61, height: 1.14 },
+  { id: 2, timestamp: '2025-05-29 11:00 AM', temperature: 28.7, humidity: 66, height: 20 },
+  { id: 3, timestamp: '2025-05-29 10:30 AM', temperature: 27.9, humidity: 63, height: 20 },
+  { id: 4, timestamp: '2025-05-29 10:00 AM', temperature: 28.0, humidity: 65, height: 20 },
+  { id: 5, timestamp: '2025-05-29 09:30 AM', temperature: 27.8, humidity: 62, height: 20 },
+  { id: 6, timestamp: '2025-05-29 09:00 AM', temperature: 28.1, humidity: 64, height: 20 },
+  { id: 7, timestamp: '2025-05-29 08:30 AM', temperature: 27.7, humidity: 61, height: 20 },
 ];
 
 // Animation variants
