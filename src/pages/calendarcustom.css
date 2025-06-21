@@ -1,0 +1,21 @@
+.react-calendar {
+    font-family: 'Inter', sans-serif;
+    border: none;
+    background-color: transparent;
+  }
+  
+  .react-calendar__tile {
+    padding: 0.75rem 0.5rem;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s;
+  }
+  
+  .react-calendar__tile--active {
+    background-color: #3b82f6 !important; /* Tailwind's blue-500 */
+    color: white;
+  }
+  
+  .react-calendar__tile:enabled:hover {
+    background-color: #e0f2fe !important; /* Tailwind's blue-100 */
+  }
+  

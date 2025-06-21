@@ -1,35 +1,69 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Compose from './pages/Compose.jsx';
-import Transfer from './pages/Transfer.jsx';
-import Profile from './pages/Profile.jsx';
-import UserDetail from './components/UserDetails.jsx';
-import Login from './pages/login.jsx';
-import History from './pages/History.jsx';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import BottomNav from './components/BottomNav';
+import TasksPage from './pages/TasksPage';
+import CalendarPage from './pages/CalendarPage';
+import AccountPage from './pages/AccountPage';
+import CoursesPage from './pages/CoursesPage';
+import TaskDetailPage from './pages/TaskDetailPage';
 
-function App() {
-  const isAuthenticated = !!localStorage.getItem('token'); // Periksa token di localStorage
+const App = () => {
+  const [activeTab, setActiveTab] = useState('tasks');
+  const [tasks, setTasks] = useState([
+    {
+      id: 1,
+      agenda: 'Selesaikan laporan',
+      date: '2025-06-20',
+      completed: false,
+      courseId: 1,
+      type: 'Course',
+      priority: 'Sedang',
+      category: 'Tugas',
+    },
+    {
+      id: 2,
+      agenda: 'Rapat tim',
+      date: '2025-06-21',
+      completed: true,
+      courseId: null,
+      type: 'General',
+      priority: 'Tinggi',
+      category: 'Kerja',
+    },
+  ]);
+  const [courses, setCourses] = useState([
+    { id: 1, name: 'Algoritma', code: 'ALPRO101' },
+    { id: 2, name: 'Basis Data', code: 'DB101' },
+  ]);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'tasks':
+        return <TasksPage tasks={tasks} setTasks={setTasks} courses={courses} />;
+      case 'calendar':
+        return <CalendarPage tasks={tasks} courses={courses} />;
+      case 'account':
+        return <AccountPage tasks={tasks} courses={courses} />;
+      case 'courses':
+        return <CoursesPage courses={courses} setCourses={setCourses} tasks={tasks} setTasks={setTasks} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-        <div className="flex-grow pb-16">
+      <div className="flex flex-col h-screen bg-gray-50">
+        <div className="flex-1 overflow-y-auto">
           <Routes>
-            <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
-            <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
-            <Route path="/home" element={<Dashboard />} />
-            <Route path="/compose" element={<Compose />} />
-            <Route path="/transfer" element={<Transfer />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/userdetail" element={<UserDetail />} />
-            <Route path="/history" element={<History />} />
+            <Route path="/" element={renderContent()} />
+            <Route path="/task/:id" element={<TaskDetailPage tasks={tasks} courses={courses} />} />
           </Routes>
         </div>
-        <Navbar />
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
     </Router>
   );
-}
+};
 
 export default App;
