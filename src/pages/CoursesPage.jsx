@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 
 const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
   const [newName, setNewName] = useState('');
   const [newCode, setNewCode] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
-  const [showNotification, setShowNotification] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
   const [openMenuId, setOpenMenuId] = useState(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [newTaskAgenda, setNewTaskAgenda] = useState('');
   const [newTaskDate, setNewTaskDate] = useState('');
-  const [newTaskPriority, setNewTaskPriority] = useState('Sedang');
-  const [newTaskCategory, setNewTaskCategory] = useState('Tugas');
+  const [newTaskPriority, setNewTaskPriority] = useState('Medium');
+  const [newTaskCategory, setNewTaskCategory] = useState('Assignment');
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const menuRefs = useRef({});
 
@@ -25,6 +26,11 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openMenuId]);
 
+  const showNotification = (message, type = 'success') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 3000);
+  };
+
   const handleAddCourse = (e) => {
     e.preventDefault();
     if (!newName || !newCode) return;
@@ -37,6 +43,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
 
     setCourses([...courses, newCourse]);
     resetCourseForm();
+    showNotification('Course successfully added', 'success');
   };
 
   const handleEditCourse = (e) => {
@@ -49,16 +56,18 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
       )
     );
     resetCourseForm();
+    showNotification('Course successfully updated', 'success');
   };
 
   const handleDeleteCourse = (id) => {
     if (tasks.some((task) => task.courseId === id)) {
-      alert('Tidak dapat menghapus mata kuliah yang memiliki tugas terkait.');
+      showNotification('Cannot delete course with associated tasks', 'error');
       return;
     }
-    if (window.confirm('Hapus mata kuliah ini?')) {
+    if (window.confirm('Delete this course?')) {
       setCourses(courses.filter((course) => course.id !== id));
       setOpenMenuId(null);
+      showNotification('Course successfully deleted', 'success');
     }
   };
 
@@ -79,6 +88,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
 
     setTasks([...tasks, newTask]);
     resetTaskForm();
+    showNotification('Task successfully added', 'success');
   };
 
   const resetCourseForm = () => {
@@ -86,36 +96,38 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
     setNewCode('');
     setIsModalOpen(false);
     setEditingCourse(null);
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
   };
 
   const resetTaskForm = () => {
     setNewTaskAgenda('');
     setNewTaskDate('');
-    setNewTaskPriority('Sedang');
-    setNewTaskCategory('Tugas');
+    setNewTaskPriority('Medium');
+    setNewTaskCategory('Assignment');
     setIsTaskModalOpen(false);
     setSelectedCourseId(null);
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
   };
 
   return (
     <div className="p-4 pb-24 min-h-screen bg-gray-50">
-      {/* Notifikasi */}
-      {showNotification && (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-[999]">
-          ✅ {editingCourse ? 'Mata kuliah diperbarui!' : isTaskModalOpen ? 'Tugas ditambahkan!' : 'Mata kuliah ditambahkan!'}
+      {/* Notification */}
+      {notification.show && (
+        <div
+          className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg z-[999] ${
+            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white`}
+          role="alert"
+          aria-live="polite"
+        >
+          {notification.message}
         </div>
       )}
 
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">📚 Mata Kuliah</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Courses</h2>
 
-      {/* Daftar Mata Kuliah */}
+      {/* Course List */}
       <div className="mb-8">
         {courses.length === 0 ? (
-          <p className="text-gray-500 italic">Tidak ada mata kuliah.</p>
+          <p className="text-gray-500 italic">No courses available.</p>
         ) : (
           courses.map((course) => (
             <div
@@ -130,7 +142,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
                 <button
                   onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)}
                   className="text-gray-600 text-xl"
-                  aria-label={`Menu untuk ${course.name}`}
+                  aria-label={`Menu for ${course.name}`}
                 >
                   ⋮
                 </button>
@@ -157,7 +169,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
                       }}
                       className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded text-sm text-red-500"
                     >
-                      Hapus
+                      Delete
                     </button>
                     <button
                       onClick={() => {
@@ -167,7 +179,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
                       }}
                       className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded text-sm"
                     >
-                      Tambah Tugas
+                      Add Task
                     </button>
                   </div>
                 )}
@@ -177,7 +189,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
         )}
       </div>
 
-      {/* Tombol Tambah Mata Kuliah */}
+      {/* Add Course Button */}
       <button
         onClick={() => {
           setEditingCourse(null);
@@ -186,48 +198,52 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
           setIsModalOpen(true);
         }}
         className="fixed bottom-20 right-4 bg-blue-500 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl hover:bg-blue-600 transition-all z-50"
-        aria-label="Tambah mata kuliah"
+        aria-label="Add course"
       >
         <span className="text-3xl font-bold">＋</span>
       </button>
 
-      {/* Modal Tambah/Edit Mata Kuliah */}
+      {/* Add/Edit Course Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-11/12 max-w-md shadow-lg">
             <h3 className="text-lg font-semibold mb-4">
-              {editingCourse ? 'Edit Mata Kuliah' : 'Tambah Mata Kuliah'}
+              {editingCourse ? 'Edit Course' : 'Add Course'}
             </h3>
             <form onSubmit={editingCourse ? handleEditCourse : handleAddCourse} className="space-y-4">
               <input
                 type="text"
-                placeholder="Nama Mata Kuliah"
+                placeholder="Course Name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+                aria-label="Course name"
               />
               <input
                 type="text"
-                placeholder="Kode Mata Kuliah"
+                placeholder="Course Code"
                 value={newCode}
                 onChange={(e) => setNewCode(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+                aria-label="Course code"
               />
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
                   onClick={resetCourseForm}
                   className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                  aria-label="Cancel"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  aria-label={editingCourse ? 'Save course' : 'Add course'}
                 >
-                  {editingCourse ? 'Simpan' : 'Tambah'}
+                  {editingCourse ? 'Save' : 'Add'}
                 </button>
               </div>
             </form>
@@ -235,11 +251,11 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
         </div>
       )}
 
-      {/* Modal Tambah Tugas */}
+      {/* Add Task Modal */}
       {isTaskModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-11/12 max-w-md shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Tambah Tugas</h3>
+            <h3 className="text-lg font-semibold mb-4">Add Task</h3>
             <form onSubmit={handleAddTask} className="space-y-4">
               <input
                 type="text"
@@ -248,6 +264,7 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
                 onChange={(e) => setNewTaskAgenda(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+                aria-label="Task agenda"
               />
               <input
                 type="date"
@@ -255,38 +272,43 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
                 onChange={(e) => setNewTaskDate(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+                aria-label="Task date"
               />
               <select
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                aria-label="Task priority"
               >
-                <option value="Tinggi">Tinggi</option>
-                <option value="Sedang">Sedang</option>
-                <option value="Rendah">Rendah</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
               </select>
               <select
                 value={newTaskCategory}
                 onChange={(e) => setNewTaskCategory(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                aria-label="Task category"
               >
-                <option value="Tugas">Tugas</option>
-                <option value="Ujian">Ujian</option>
-                <option value="Proyek">Proyek</option>
+                <option value="Assignment">Assignment</option>
+                <option value="Exam">Exam</option>
+                <option value="Project">Project</option>
               </select>
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
                   onClick={resetTaskForm}
                   className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                  aria-label="Cancel"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  aria-label="Add task"
                 >
-                  Tambah
+                  Add
                 </button>
               </div>
             </form>
@@ -295,6 +317,24 @@ const CoursesPage = ({ courses, setCourses, tasks, setTasks }) => {
       )}
     </div>
   );
+};
+
+CoursesPage.propTypes = {
+  courses: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      code: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  setCourses: PropTypes.func.isRequired,
+  tasks: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      courseId: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  setTasks: PropTypes.func.isRequired,
 };
 
 export default CoursesPage;

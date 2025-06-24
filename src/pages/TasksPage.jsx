@@ -1,17 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-const TasksPage = ({ tasks, setTasks, courses }) => {
+const CONFIG = {
+  TYPES: ['General', 'Course'],
+  PRIORITIES: ['High', 'Medium', 'Low'],
+  CATEGORIES: {
+    General: ['Personal', 'Work', 'Other'],
+    Course: ['Assignment', 'Exam', 'Project'],
+  },
+};
+
+const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
   const [newAgenda, setNewAgenda] = useState('');
   const [newDate, setNewDate] = useState('');
   const [newCourseId, setNewCourseId] = useState('');
-  const [newPriority, setNewPriority] = useState('Sedang');
-  const [newCategory, setNewCategory] = useState('Tugas');
+  const [newPriority, setNewPriority] = useState('Medium');
+  const [newCategory, setNewCategory] = useState('Personal');
   const [newType, setNewType] = useState('General');
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
@@ -30,87 +38,78 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openMenuId]);
 
+  const showNotification = (message, type = 'success') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 3000);
+  };
+
   const handleAddTask = (e) => {
     e.preventDefault();
-    if (!newAgenda || !newDate || (newType === 'Course' && !newCourseId)) return;
-
-    const newTask = {
-      id: tasks.length + 1,
-      agenda: newAgenda,
-      date: newDate,
-      completed: false,
-      courseId: newType === 'Course' ? parseInt(newCourseId) : null,
-      type: newType,
-      priority: newPriority,
-      category: newCategory,
-    };
-
-    setTasks([...tasks, newTask]);
-    setNotificationMessage('Agenda ditambahkan!');
-    resetForm();
+    if (!newAgenda || !newDate || (newType === 'Course' && !newCourseId)) {
+      showNotification('Please fill all required fields', 'error');
+      return;
+    }
+    try {
+      new Date(newDate); // Validate date
+      const newTask = {
+        id: tasks.length + 1,
+        agenda: newAgenda,
+        date: newDate,
+        completed: false,
+        courseId: newType === 'Course' ? parseInt(newCourseId) : null,
+        type: newType,
+        priority: newPriority,
+        category: newCategory,
+      };
+      setTasks([...tasks, newTask]);
+      showNotification('Task added successfully', 'success');
+      resetForm();
+    } catch {
+      showNotification('Invalid date format', 'error');
+    }
   };
 
   const handleEditTask = (e) => {
     e.preventDefault();
-    if (!newAgenda || !newDate || (newType === 'Course' && !newCourseId) || !editingTask) return;
-
-    setTasks(
-      tasks.map((task) =>
-        task.id === editingTask.id
-          ? {
-              ...task,
-              agenda: newAgenda,
-              date: newDate,
-              courseId: newType === 'Course' ? parseInt(newCourseId) : null,
-              type: newType,
-              priority: newPriority,
-              category: newCategory,
-            }
-          : task
-      )
-    );
-    setNotificationMessage('Agenda diperbarui!');
-    resetForm();
+    if (!newAgenda || !newDate || (newType === 'Course' && !newCourseId) || !editingTask) {
+      showNotification('Please fill all required fields', 'error');
+      return;
+    }
+    try {
+      new Date(newDate); // Validate date
+      setTasks(
+        tasks.map((task) =>
+          task.id === editingTask.id
+            ? { ...task, agenda: newAgenda, date: newDate, courseId: newType === 'Course' ? parseInt(newCourseId) : null, type: newType, priority: newPriority, category: newCategory }
+            : task
+        )
+      );
+      showNotification('Task updated successfully', 'success');
+      resetForm();
+    } catch {
+      showNotification('Invalid date format', 'error');
+    }
   };
 
   const handleDeleteTask = (id) => {
-    if (window.confirm('Hapus tugas ini?')) {
+    if (window.confirm('Delete this task?')) {
       setTasks(tasks.filter((task) => task.id !== id));
       setOpenMenuId(null);
-      setNotificationMessage('Agenda dihapus!');
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 3000);
+      showNotification('Task deleted successfully', 'success');
     }
   };
 
   const handleDuplicateTask = (task) => {
-    const newTask = {
-      id: tasks.length + 1,
-      agenda: task.agenda,
-      date: task.date,
-      completed: false,
-      courseId: task.courseId,
-      type: task.type,
-      priority: task.priority,
-      category: task.category,
-    };
+    const newTask = { ...task, id: tasks.length + 1, completed: false };
     setTasks([...tasks, newTask]);
     setOpenMenuId(null);
-    setNotificationMessage('Agenda diduplikasi!');
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
+    showNotification('Task duplicated successfully', 'success');
   };
 
   const handleToggleComplete = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
     const task = tasks.find((task) => task.id === id);
-    setNotificationMessage(task.completed ? 'Agenda belum selesai!' : 'Agenda selesai!');
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
+    setTasks(tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)));
+    showNotification(task.completed ? 'Task marked as incomplete' : 'Task marked as complete', 'success');
   };
 
   const handleTaskClick = (task) => {
@@ -124,120 +123,112 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
   const handleSortByDateAsc = () => {
     setTasks([...tasks].sort((a, b) => new Date(a.date) - new Date(b.date)));
     setIsSortModalOpen(false);
+    showNotification('Tasks sorted by date (ascending)', 'success');
   };
 
   const handleSortByDateDesc = () => {
     setTasks([...tasks].sort((a, b) => new Date(b.date) - new Date(a.date)));
     setIsSortModalOpen(false);
+    showNotification('Tasks sorted by date (descending)', 'success');
   };
 
   const handleDeleteCompleted = () => {
     setTasks(tasks.filter((task) => !task.completed));
     setIsSortModalOpen(false);
-    setNotificationMessage('Agenda selesai dihapus!');
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
+    showNotification('Completed tasks deleted', 'success');
   };
 
   const resetForm = () => {
     setNewAgenda('');
     setNewDate('');
     setNewCourseId('');
-    setNewPriority('Sedang');
-    setNewCategory(newType === 'General' ? 'Pribadi' : 'Tugas');
+    setNewPriority('Medium');
+    setNewCategory(newType === 'General' ? 'Personal' : 'Assignment');
     setNewType('General');
     setIsModalOpen(false);
     setEditingTask(null);
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
   };
 
-  const filteredTasks = tasks.filter((task) =>
-    task.agenda.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (!typeFilter || task.type === typeFilter)
-  );
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(
+      (task) =>
+        task.agenda.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (!typeFilter || task.type === typeFilter)
+    );
+  }, [tasks, searchQuery, typeFilter]);
 
-  const pendingTasks = filteredTasks.filter((task) => !task.completed);
-  const completedTasks = filteredTasks.filter((task) => task.completed);
+  const pendingTasks = useMemo(() => filteredTasks.filter((task) => !task.completed), [filteredTasks]);
+  const completedTasks = useMemo(() => filteredTasks.filter((task) => task.completed), [filteredTasks]);
 
   const getCourseName = (courseId) => {
     const course = courses.find((c) => c.id === courseId);
-    return course ? course.name : 'Tidak Diketahui';
+    return course ? course.name : 'Unknown';
   };
 
   return (
     <div className="p-4 pb-24 relative min-h-screen bg-gray-50">
-      {/* Notifikasi */}
-      {showNotification && (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-[999]">
-          ✅ {notificationMessage}
+      {/* Notification */}
+      {notification.show && (
+        <div
+          className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg z-[999] ${
+            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white`}
+          role="alert"
+          aria-live="polite"
+        >
+          {notification.message}
         </div>
       )}
 
-      {/* Tombol menu utama */}
-      <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="fixed top-4 right-4 text-gray-600 text-2xl z-10"
-        aria-label="Menu utama"
-      >
-        ⋮
-      </button>
-
-      {/* Dropdown Menu utama */}
-      {isMenuOpen && (
-        <div className="fixed top-12 right-4 bg-white shadow-lg rounded-lg p-4 w-40 z-50 border transition">
-          <button
-            onClick={() => {
-              setIsSortModalOpen(true);
-              setIsMenuOpen(false);
-            }}
-            className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded text-sm"
-          >
-            Sortir Agenda
-          </button>
-        </div>
-      )}
-
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 Daftar Agenda</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Task List</h2>
 
       {/* Filter Type */}
       <select
         value={typeFilter}
         onChange={(e) => setTypeFilter(e.target.value)}
         className="w-full px-4 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition mb-4"
+        aria-label="Filter by type"
       >
-        <option value="">Semua Tipe</option>
-        <option value="General">General</option>
-        <option value="Course">Kuliah</option>
+        <option value="">All Types</option>
+        {CONFIG.TYPES.map((type) => (
+          <option key={type} value={type}>
+            {type}
+          </option>
+        ))}
       </select>
 
-      {/* Input pencarian */}
+      {/* Search Input */}
       <input
         type="text"
-        placeholder="Cari agenda..."
+        placeholder="Search tasks..."
         value={searchQuery}
         onChange={handleSearch}
         className="w-full px-4 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition mb-6"
+        aria-label="Search tasks"
       />
 
-      {/* Belum selesai */}
+      {/* Pending Tasks */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">Belum Selesai</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-700">Pending Tasks</h3>
         {pendingTasks.length === 0 ? (
-          <p className="text-gray-500 italic">Tidak ada agenda belum selesai.</p>
+          <p className="text-gray-500 italic">No pending tasks.</p>
         ) : (
           pendingTasks.map((task) => (
             <div
               key={task.id}
               className="p-4 bg-white rounded-xl shadow hover:shadow-md transition-all flex justify-between items-center border border-gray-100 mb-2 cursor-pointer relative"
               onClick={() => handleTaskClick(task)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleTaskClick(task)}
+              aria-label={`View task: ${task.agenda}`}
             >
               <div>
                 <p className="font-medium text-gray-800">{task.agenda}</p>
                 <p className="text-sm text-gray-500">
-                  {task.type === 'General' ? '📄' : '📚'} {task.type === 'General' ? 'General' : getCourseName(task.courseId)} | ⭐ {task.priority} | 📌 {task.category}
+                  Type: {task.type === 'General' ? 'General' : getCourseName(task.courseId)} | Priority: {task.priority} | Category: {task.category}
                 </p>
-                <p className="text-sm text-gray-500">📅 {task.date}</p>
+                <p className="text-sm text-gray-500">Date: {task.date}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <input
@@ -246,6 +237,7 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                   onChange={() => handleToggleComplete(task.id)}
                   onClick={(e) => e.stopPropagation()}
                   className="w-5 h-5 text-blue-500 accent-blue-500"
+                  aria-label={`Mark ${task.agenda} as ${task.completed ? 'incomplete' : 'complete'}`}
                 />
                 <button
                   onClick={(e) => {
@@ -253,7 +245,7 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                     setOpenMenuId(openMenuId === task.id ? null : task.id);
                   }}
                   className="text-gray-600 text-xl"
-                  aria-label={`Menu untuk ${task.agenda}`}
+                  aria-label={`Menu for ${task.agenda}`}
                 >
                   ⋮
                 </button>
@@ -305,24 +297,28 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
         )}
       </div>
 
-      {/* Selesai */}
+      {/* Completed Tasks */}
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">Selesai</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-700">Completed Tasks</h3>
         {completedTasks.length === 0 ? (
-          <p className="text-gray-500 italic">Tidak ada agenda selesai.</p>
+          <p className="text-gray-500 italic">No completed tasks.</p>
         ) : (
           completedTasks.map((task) => (
             <div
               key={task.id}
               className="p-4 bg-white rounded-xl shadow hover:shadow-md transition-all flex justify-between items-center border border-gray-100 mb-2 cursor-pointer relative"
               onClick={() => handleTaskClick(task)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleTaskClick(task)}
+              aria-label={`View task: ${task.agenda}`}
             >
               <div>
                 <p className="font-medium text-gray-500 line-through">{task.agenda}</p>
                 <p className="text-sm text-gray-400">
-                  {task.type === 'General' ? '📄' : '📚'} {task.type === 'General' ? 'General' : getCourseName(task.courseId)} | ⭐ {task.priority} | 📌 {task.category}
+                  Type: {task.type === 'General' ? 'General' : getCourseName(task.courseId)} | Priority: {task.priority} | Category: {task.category}
                 </p>
-                <p className="text-sm text-gray-400">📅 {task.date}</p>
+                <p className="text-sm text-gray-400">Date: {task.date}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <input
@@ -331,6 +327,7 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                   onChange={() => handleToggleComplete(task.id)}
                   onClick={(e) => e.stopPropagation()}
                   className="w-5 h-5 text-blue-500 accent-blue-500"
+                  aria-label={`Mark ${task.agenda} as ${task.completed ? 'incomplete' : 'complete'}`}
                 />
                 <button
                   onClick={(e) => {
@@ -338,7 +335,7 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                     setOpenMenuId(openMenuId === task.id ? null : task.id);
                   }}
                   className="text-gray-600 text-xl"
-                  aria-label={`Menu untuk ${task.agenda}`}
+                  aria-label={`Menu for ${task.agenda}`}
                 >
                   ⋮
                 </button>
@@ -390,29 +387,29 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
         )}
       </div>
 
-      {/* Tombol Tambah */}
+      {/* Add Button */}
       <button
         onClick={() => {
           setEditingTask(null);
           setNewAgenda('');
           setNewDate('');
           setNewCourseId('');
-          setNewPriority('Sedang');
-          setNewCategory('Pribadi');
+          setNewPriority('Medium');
+          setNewCategory('Personal');
           setNewType('General');
           setIsModalOpen(true);
         }}
         className="fixed bottom-20 right-4 bg-blue-500 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl hover:bg-blue-600 transition-all z-50"
-        aria-label="Tambah agenda"
+        aria-label="Add task"
       >
-        <span className="text-3xl font-bold">＋</span>
+        <span className="text-3xl font-bold">+</span>
       </button>
 
-      {/* Modal Tambah/Edit */}
+      {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-11/12 max-w-md shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">{editingTask ? 'Edit Agenda' : 'Tambah Agenda'}</h3>
+            <h3 className="text-lg font-semibold mb-4">{editingTask ? 'Edit Task' : 'Add Task'}</h3>
             <form onSubmit={editingTask ? handleEditTask : handleAddTask} className="space-y-4">
               <input
                 type="text"
@@ -421,6 +418,7 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                 onChange={(e) => setNewAgenda(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+                aria-label="Task agenda"
               />
               <input
                 type="date"
@@ -428,18 +426,23 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                 onChange={(e) => setNewDate(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+                aria-label="Task date"
               />
               <select
                 value={newType}
                 onChange={(e) => {
                   setNewType(e.target.value);
                   setNewCourseId('');
-                  setNewCategory(e.target.value === 'General' ? 'Pribadi' : 'Tugas');
+                  setNewCategory(e.target.value === 'General' ? 'Personal' : 'Assignment');
                 }}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                aria-label="Task type"
               >
-                <option value="General">General</option>
-                <option value="Course">Kuliah</option>
+                {CONFIG.TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
               </select>
               {newType === 'Course' && (
                 <select
@@ -447,8 +450,12 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                   onChange={(e) => setNewCourseId(e.target.value)}
                   className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   required
+                  disabled={courses.length === 0}
+                  aria-label="Select course"
                 >
-                  <option value="" disabled>Pilih Mata Kuliah</option>
+                  <option value="" disabled>
+                    {courses.length === 0 ? 'No courses available' : 'Select Course'}
+                  </option>
                   {courses.map((course) => (
                     <option key={course.id} value={course.id}>
                       {course.name} ({course.code})
@@ -460,43 +467,41 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                aria-label="Task priority"
               >
-                <option value="Tinggi">Tinggi</option>
-                <option value="Sedang">Sedang</option>
-                <option value="Rendah">Rendah</option>
+                {CONFIG.PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ))}
               </select>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                aria-label="Task category"
               >
-                {newType === 'General' ? (
-                  <>
-                    <option value="Pribadi">Pribadi</option>
-                    <option value="Kerja">Kerja</option>
-                    <option value="Lainnya">Lainnya</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="Tugas">Tugas</option>
-                    <option value="Ujian">Ujian</option>
-                    <option value="Proyek">Proyek</option>
-                  </>
-                )}
+                {CONFIG.CATEGORIES[newType].map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
                   onClick={resetForm}
                   className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                  aria-label="Cancel"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  aria-label={editingTask ? 'Save task' : 'Add task'}
                 >
-                  {editingTask ? 'Simpan' : 'Tambah'}
+                  {editingTask ? 'Save' : 'Add'}
                 </button>
               </div>
             </form>
@@ -504,35 +509,39 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
         </div>
       )}
 
-      {/* Modal Sortir */}
+      {/* Sort Modal */}
       {isSortModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-11/12 max-w-md shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Sortir Agenda</h3>
+            <h3 className="text-lg font-semibold mb-4">Sort Tasks</h3>
             <div className="space-y-2">
               <button
                 onClick={handleSortByDateAsc}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
+                aria-label="Sort by date ascending"
               >
-                Urutkan berdasarkan Tanggal (Asc)
+                Sort by Date (Ascending)
               </button>
               <button
                 onClick={handleSortByDateDesc}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
+                aria-label="Sort by date descending"
               >
-                Urutkan berdasarkan Tanggal (Desc)
+                Sort by Date (Descending)
               </button>
               <button
                 onClick={handleDeleteCompleted}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-red-500"
+                aria-label="Delete completed tasks"
               >
-                Hapus Agenda Selesai
+                Delete Completed Tasks
               </button>
               <button
                 onClick={() => setIsSortModalOpen(false)}
                 className="w-full text-left px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                aria-label="Close sort modal"
               >
-                Tutup
+                Close
               </button>
             </div>
           </div>
@@ -540,6 +549,29 @@ const TasksPage = ({ tasks, setTasks, courses }) => {
       )}
     </div>
   );
+};
+
+TasksPage.propTypes = {
+  tasks: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      agenda: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      completed: PropTypes.bool.isRequired,
+      courseId: PropTypes.number,
+      type: PropTypes.string.isRequired,
+      priority: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  setTasks: PropTypes.func.isRequired,
+  courses: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      code: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default TasksPage;
