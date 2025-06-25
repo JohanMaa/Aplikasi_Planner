@@ -71,7 +71,7 @@ const CalendarPage = ({ tasks = [], courses = [] }) => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Calendar</h2>
 
       {/* Filter */}
-      <div className="mb-6 bg-white p-4 rounded-xl shadow-md border border-gray-100">
+      {/* <div className="mb-6 bg-white p-4 rounded-xl shadow-md border border-gray-100">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label
@@ -166,7 +166,7 @@ const CalendarPage = ({ tasks = [], courses = [] }) => {
         >
           Reset Filters
         </button>
-      </div>
+      </div> */}
 
       {/* Calendar */}
       <div className="mb-8">
