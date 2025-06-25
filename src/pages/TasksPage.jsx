@@ -428,7 +428,7 @@ const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
                 required
                 aria-label="Task date"
               />
-              <select
+              {/* <select
                 value={newType}
                 onChange={(e) => {
                   setNewType(e.target.value);
@@ -486,7 +486,7 @@ const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
                     {category}
                   </option>
                 ))}
-              </select>
+              </select> */}
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
