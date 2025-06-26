@@ -183,7 +183,7 @@ const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Task List</h2>
 
       {/* Filter Type */}
-      {/* <select
+      <select
         value={typeFilter}
         onChange={(e) => setTypeFilter(e.target.value)}
         className="w-full px-4 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition mb-4"
@@ -195,7 +195,7 @@ const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
             {type}
           </option>
         ))}
-      </select> */}
+      </select>
 
       {/* Search Input */}
       <input
@@ -428,7 +428,7 @@ const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
                 required
                 aria-label="Task date"
               />
-              {/* <select
+              <select
                 value={newType}
                 onChange={(e) => {
                   setNewType(e.target.value);
@@ -486,7 +486,7 @@ const TasksPage = ({ tasks = [], setTasks, courses = [] }) => {
                     {category}
                   </option>
                 ))}
-              </select> */}
+              </select>
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
